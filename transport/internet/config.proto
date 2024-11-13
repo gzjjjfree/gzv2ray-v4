@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+package gzv2ray.core.transport.internet;
+option csharp_namespace = "GzV2Ray.Core.Transport.Internet";
+option go_package = "github.com/gzjjjfree/gzv2ray-v4/transport/internet";
+option java_package = "com.gzv2ray.core.transport.internet";
+option java_multiple_files = true;
+
+import "common/serial/typed_message.proto";
+
+enum TransportProtocol {
+  TCP = 0;
+  UDP = 1;
+  MKCP = 2;
+  WebSocket = 3;
+  HTTP = 4;
+  DomainSocket = 5;
+}
+
+message TransportConfig {
+  // Type of network that this settings supports.
+  // Deprecated. Use the string form below.
+  // 此设置支持的网络类型。已弃用。请使用下面的字符串形式。
+  TransportProtocol protocol = 1 [ deprecated = true ];
+
+  // Type of network that this settings supports.
+  // 此设置支持的网络类型。
+  string protocol_name = 3;
+
+  // Specific settings. Must be of the transports.
+  // 具体设置。必须是传输方式。
+  gzv2ray.core.common.serial.TypedMessage settings = 2;
+}
+
+message StreamConfig {
+  // Effective network. Deprecated. Use the string form below.
+  // 有效网络。已弃用。使用下面的字符串形式。
+  TransportProtocol protocol = 1 [ deprecated = true ];
+
+  // Effective network. 有效网络。
+  string protocol_name = 5;
+
+  repeated TransportConfig transport_settings = 2;
+
+  // Type of security. Must be a message name of the settings proto.
+  // 安全类型。必须是设置协议的消息名称。
+  string security_type = 3;
+
+  // Settings for transport security. For now the only choice is TLS.
+  // 传输安全设置。目前唯一的选择是 TLS。
+  repeated gzv2ray.core.common.serial.TypedMessage security_settings = 4;
+
+  SocketConfig socket_settings = 6;
+}
+
+message ProxyConfig {
+  string tag = 1;
+
+  bool transportLayerProxy = 2;
+}
+
+// SocketConfig is options to be applied on network sockets.
+// SocketConfig 是应用于网络套接字的选项。
+message SocketConfig {
+  // Mark of the connection. If non-zero, the value will be set to SO_MARK.
+  // 连接的标记。如果非零，则该值将设置为 SO_MARK。
+  int32 mark = 1;
+
+  enum TCPFastOpenState {
+    // AsIs is to leave the current TFO state as is, unmodified.
+    // AsIs 是保持当前 TFO 状态不变，不做修改。
+    AsIs = 0;
+    // Enable is for enabling TFO explictly.
+    // 启用是为了明确启用 TFO。
+    Enable = 1;
+    // Disable is for disabling TFO explictly.
+    // 禁用是为了明确禁用 TFO。
+    Disable = 2;
+  }
+
+  // TFO is the state of TFO settings.
+  // TFO 是 TFO 设置的状态。
+  TCPFastOpenState tfo = 2;
+
+  enum TProxyMode {
+    // TProxy is off.
+    Off = 0;
+    // TProxy mode.
+    TProxy = 1;
+    // Redirect mode.
+    Redirect = 2;
+  }
+
+  // TProxy is for enabling TProxy socket option.
+  // TProxy 用于启用 TProxy 套接字选项。
+  TProxyMode tproxy = 3;
+
+  // ReceiveOriginalDestAddress is for enabling IP_RECVORIGDSTADDR socket
+  // option. This option is for UDP only.
+  // ReceiveOriginalDestAddress 用于启用 IP_RECVORIGDSTADDR 套接字选项。此选项仅适用于 UDP。
+  bool receive_original_dest_address = 4;
+
+  bytes bind_address = 5;
+
+  uint32 bind_port = 6;
+
+  bool accept_proxy_protocol = 7;
+}

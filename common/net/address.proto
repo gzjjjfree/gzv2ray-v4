@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package gzv2ray.core.common.net;
+option csharp_namespace = "GzV2Ray.Core.Common.Net";
+option go_package = "github.com/gzjjjfree/gzv2ray-v4/common/net";
+option java_package = "com.gzv2ray.core.common.net";
+option java_multiple_files = true;
+
+// Address of a network host. It may be either an IP address or a domain address.
+// 网络主机的地址。可以是 IP 地址，也可以是域名地址
+message IPOrDomain {
+  oneof address {
+    // IP address. Must by either 4 or 16 bytes.
+    // IP 地址。必须为 4 个或 16 个字节。
+    bytes ip = 1;
+
+    // Domain address.
+    // 域名地址。
+    string domain = 2;
+  }
+}

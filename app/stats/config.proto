@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package gzv2ray.core.app.stats;
+option csharp_namespace = "GzV2Ray.Core.App.Stats";
+option go_package = "github.com/gzjjjfree/gzv2ray-v4/app/stats";
+option java_package = "com.gzv2ray.core.app.stats";
+option java_multiple_files = true;
+
+message Config {}
+
+message ChannelConfig {
+  bool Blocking = 1;
+  int32 SubscriberLimit = 2;
+  int32 BufferSize = 3;
+}

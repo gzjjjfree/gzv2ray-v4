@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package gzv2ray.core.common.net;
+option csharp_namespace = "GzV2Ray.Core.Common.Net";
+option go_package = "github.com/gzjjjfree/gzv2ray-v4/common/net";
+option java_package = "com.gzv2ray.core.common.net";
+option java_multiple_files = true;
+
+import "common/net/network.proto";
+import "common/net/address.proto";
+
+// Endpoint of a network connection.
+message Endpoint {
+  Network network = 1;
+  IPOrDomain address = 2;
+  uint32 port = 3;
+}

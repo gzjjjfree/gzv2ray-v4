@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+package gzv2ray.core.app.proxyman;
+option csharp_namespace = "GzV2Ray.Core.App.Proxyman";
+option go_package = "github.com/gzjjjfree/gzv2ray-v4/app/proxyman";
+option java_package = "com.gzv2ray.core.app.proxyman";
+option java_multiple_files = true;
+
+import "common/net/address.proto";
+import "common/net/port.proto";
+import "transport/internet/config.proto";
+import "common/serial/typed_message.proto";
+
+message InboundConfig {}
+
+message AllocationStrategy {
+  enum Type {
+    // Always allocate all connection handlers.
+    // 始终分配所有连接处理程序。
+    Always = 0;
+
+    // Randomly allocate specific range of handlers.
+    // 随机分配特定范围的处理程序。
+    Random = 1;
+
+    // External. Not supported yet.
+    // 外部。尚不支持。
+    External = 2;
+  }
+
+  Type type = 1;
+
+  message AllocationStrategyConcurrency {
+    uint32 value = 1;
+  }
+
+  // Number of handlers (ports) running in parallel.
+  // Default value is 3 if unset.
+  // 并行运行的处理程序（端口）的数量。如果未设置，则默认值为 3。
+  AllocationStrategyConcurrency concurrency = 2;
+
+  message AllocationStrategyRefresh {
+    uint32 value = 1;
+  }
+
+  // Number of minutes before a handler is regenerated.
+  // Default value is 5 if unset.
+  // 处理程序重新生成前的分钟数。如果未设置，则默认值为 5
+  AllocationStrategyRefresh refresh = 3;
+}
+
+enum KnownProtocols {
+  HTTP = 0;
+  TLS = 1;
+}
+
+message SniffingConfig {
+  // Whether or not to enable content sniffing on an inbound connection.
+  // 是否在入站连接上启用内容嗅探。
+  bool enabled = 1;
+
+  // Override target destination if sniff'ed protocol is in the given list.
+  // Supported values are "http", "tls", "fakedns".
+  // 如果嗅探到的协议在给定的列表中，则覆盖目标目的地。支持的值是“http”、“tls”、“fakedns”。
+  repeated string destination_override = 2;
+
+  // Whether should only try to sniff metadata without waiting for client input.
+  // Can be used to support SMTP like protocol where server send the first message.
+  // 是否应该仅尝试嗅探元数据而不等待客户端输入。可用于支持服务器发送第一条消息的 SMTP 类协议。
+  bool metadata_only = 3;
+}
+
+message ReceiverConfig {
+  // PortRange specifies the ports which the Receiver should listen on.
+  // PortRange 指定接收器应该监听的端口。
+  gzv2ray.core.common.net.PortRange port_range = 1;
+  // Listen specifies the IP address that the Receiver should listen on.
+  // 监听指定接收器应该监听的 IP 地址。
+  gzv2ray.core.common.net.IPOrDomain listen = 2;
+  AllocationStrategy allocation_strategy = 3;
+  gzv2ray.core.transport.internet.StreamConfig stream_settings = 4;
+  bool receive_original_destination = 5;
+  reserved 6;
+  // Override domains for the given protocol.
+  // Deprecated. Use sniffing_settings.
+  // 覆盖给定协议的域。已弃用。使用 sniffing_settings
+  repeated KnownProtocols domain_override = 7 [deprecated = true];
+  SniffingConfig sniffing_settings = 8;
+}
+
+message InboundHandlerConfig {
+  string tag = 1;
+  gzv2ray.core.common.serial.TypedMessage receiver_settings = 2;
+  gzv2ray.core.common.serial.TypedMessage proxy_settings = 3;
+}
+
+message OutboundConfig {}
+
+message SenderConfig {
+  // Send traffic through the given IP. Only IP is allowed.
+  // 通过给定的 IP 发送流量。仅允许 IP。
+  gzv2ray.core.common.net.IPOrDomain via = 1;
+  gzv2ray.core.transport.internet.StreamConfig stream_settings = 2;
+  gzv2ray.core.transport.internet.ProxyConfig proxy_settings = 3;
+  MultiplexingConfig multiplex_settings = 4;
+}
+
+message MultiplexingConfig {
+  // Whether or not Mux is enabled.
+  // 是否启用 Mux。
+  bool enabled = 1;
+  // Max number of concurrent connections that one Mux connection can handle.
+  // 一个 Mux 连接可以处理的最大并发连接数。
+  uint32 concurrency = 2;
+}

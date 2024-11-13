@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package gzv2ray.core.common.net;
+option csharp_namespace = "GzV2Ray.Core.Common.Net";
+option go_package = "github.com/gzjjjfree/gzv2ray-v4/common/net";
+option java_package = "com.gzv2ray.core.common.net";
+option java_multiple_files = true;
+
+// PortRange represents a range of ports.
+// PortRange 代表端口范围。
+message PortRange {
+  // The port that this range starts from.
+  // 此范围的起始端口。
+  uint32 From = 1;
+  // The port that this range ends with (inclusive).
+  // 此范围的结束端口（含）。
+  uint32 To = 2;
+}
+
+// PortList is a list of ports.
+// PortList 是端口列表。
+message PortList {
+  repeated PortRange range = 1;
+}

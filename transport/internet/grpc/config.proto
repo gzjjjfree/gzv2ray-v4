@@ -1,0 +1,8 @@
+syntax = "proto3";
+package gzv2ray.core.transport.internet.grpc.encoding;
+option go_package = "github.com/gzjjjfree/gzv2ray-v4/transport/internet/grpc";
+
+message Config {
+  string host = 1;
+  string service_name = 2;
+}

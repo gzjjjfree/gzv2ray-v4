@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package gzv2ray.core.app.dns.fakedns;
+option csharp_namespace = "GzV2Ray.Core.App.Dns.Fakedns";
+option go_package = "github.com/gzjjjfree/gzv2ray-v4/app/dns/fakedns";
+option java_package = "com.gzv2ray.core.app.dns.fakedns";
+option java_multiple_files = true;
+
+message FakeDnsPool{
+  string ip_pool = 1; //CIDR of IP pool used as fake DNS IP
+  int64  lruSize = 2; //Size of Pool for remembering relationship between domain name and IP address
+}

@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package gzv2ray.core;
+option csharp_namespace = "GzV2Ray.Core";
+option go_package = "github.com/gzjjjfree/gzv2ray-v4;core";
+option java_package = "com.gzv2ray.core";
+option java_multiple_files = true;
+
+import "common/serial/typed_message.proto";
+import "transport/config.proto";
+
+// Config is the master config of V2Ray. V2Ray takes this config as input and
+// functions accordingly.
+message Config { // Config 是 V2Ray 的主配置。V2Ray 以该配置为输入并相应地运行。
+  // Inbound handler configurations. Must have at least one item.
+  // 入站处理程序配置。必须至少有一个项目
+  repeated InboundHandlerConfig inbound = 1;
+
+  // Outbound handler configurations. Must have at least one item. The first
+  // item is used as default for routing.
+  // 出站处理程序配置。必须至少有一个项目。第一个项目用作路由的默认值。
+  repeated OutboundHandlerConfig outbound = 2;
+
+  reserved 3;
+
+  // App is for configurations of all features in V2Ray. A feature must
+  // App 用于配置 V2Ray 中的所有功能。功能必须
+  // implement the Feature interface, and its config type must be registered
+  // 实现 Feature 接口，并且必须注册其配置类型，通过common.RegisterConfig。
+  // through common.RegisterConfig.
+  repeated gzv2ray.core.common.serial.TypedMessage app = 4;
+
+  // Transport settings. 全局运输设置。
+  // Deprecated. Each inbound and outbound should choose their own transport
+  // 已弃用。每个入站和出站都应该选择自己的传输方式
+  // config. Date to remove: 2020-01-13
+  gzv2ray.core.transport.Config transport = 5 [deprecated = true];
+
+  // Configuration for extensions. The config may not work if corresponding
+  // extension is not loaded into V2Ray. V2Ray will ignore such config during
+  // initialization.
+  // 扩展配置。如果相应的扩展未加载到 V2Ray。V2Ray 将在初始化过程中忽略此类配置
+  repeated gzv2ray.core.common.serial.TypedMessage extension = 6;
+}
+
+// InboundHandlerConfig is the configuration for inbound handler.
+// InboundHandlerConfig 是入站处理程序的配置。
+message InboundHandlerConfig {
+  // Tag of the inbound handler. The tag must be unique among all inbound
+  // handlers
+  // 入站处理程序的标签。该标签在所有入站处理程序中必须是唯一的处理程序
+  string tag = 1;
+  // Settings for how this inbound proxy is handled.
+  // 关于如何处理此入站代理的设置。
+  gzv2ray.core.common.serial.TypedMessage receiver_settings = 2;
+  // Settings for inbound proxy. Must be one of the inbound proxies.
+  // 入站代理的设置。必须是入站代理之一。
+  gzv2ray.core.common.serial.TypedMessage proxy_settings = 3;
+}
+
+// OutboundHandlerConfig is the configuration for outbound handler.
+// OutboundHandlerConfig 是出站处理程序的配置。
+message OutboundHandlerConfig {
+  // Tag of this outbound handler.
+  // 此出站处理程序的标签。
+  string tag = 1;
+  // Settings for how to dial connection for this outbound handler.
+  // 关于如何为此出站处理程序拨号连接的设置。
+  gzv2ray.core.common.serial.TypedMessage sender_settings = 2;
+  // Settings for this outbound proxy. Must be one of the outbound proxies.
+  // 此出站代理的设置。必须是出站代理之一。
+  gzv2ray.core.common.serial.TypedMessage proxy_settings = 3;
+  // If not zero, this outbound will be expired in seconds. Not used for now.
+  // 如果不为零，此出站将在秒内过期。目前未使用。
+  int64 expire = 4;
+  // Comment of this outbound handler. Not used for now.
+  // 此出站处理程序的注释。目前未使用。
+  string comment = 5;
+}

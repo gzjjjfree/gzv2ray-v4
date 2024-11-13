@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package gzv2ray.core.proxy.blackhole;
+option csharp_namespace = "GzV2Ray.Core.Proxy.Blackhole";
+option go_package = "github.com/gzjjjfree/gzv2ray-v4/proxy/blackhole";
+option java_package = "com.gzv2ray.core.proxy.blackhole";
+option java_multiple_files = true;
+
+import "common/serial/typed_message.proto";
+
+message NoneResponse {}
+
+message HTTPResponse {}
+
+message Config {
+  gzv2ray.core.common.serial.TypedMessage response = 1;
+}

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package gzv2ray.core.common.serial;
+option csharp_namespace = "GzV2Ray.Core.Common.Serial";
+option go_package = "github.com/gzjjjfree/gzv2ray-v4/common/serial";
+option java_package = "com.gzv2ray.core.common.serial";
+option java_multiple_files = true;
+
+// TypedMessage is a serialized proto message along with its type name.
+message TypedMessage { // TypedMessage 是带有其类型名称的序列化原始消息。
+  // The name of the message type, retrieved from protobuf API.
+  // 从 protobuf API 中检索的消息类型的名称
+  string type = 1;
+  // Serialized proto message. 序列化的原始消息。
+  bytes value = 2;
+}
