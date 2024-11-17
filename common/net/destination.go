@@ -3,6 +3,7 @@ package net
 import (
 	"net"
 	"strings"
+	"fmt"
 )
 
 // Destination represents a network destination including address and protocol (tcp / udp).
@@ -13,7 +14,9 @@ type Destination struct {
 }
 
 // DestinationFromAddr generates a Destination from a net address.
+// DestinationFromAddr 从网络地址生成目标。
 func DestinationFromAddr(addr net.Addr) Destination {
+fmt.Println("in common-net-destination.go func DestinationFromAddr")
 	switch addr := addr.(type) {
 	case *net.TCPAddr:
 		return TCPDestination(IPAddress(addr.IP), Port(addr.Port))
@@ -28,6 +31,7 @@ func DestinationFromAddr(addr net.Addr) Destination {
 
 // ParseDestination converts a destination from its string presentation.
 func ParseDestination(dest string) (Destination, error) {
+	fmt.Println("in common-net-destination.go func  ParseDestination")
 	d := Destination{
 		Address: AnyIP,
 		Port:    Port(0),
@@ -114,6 +118,7 @@ func (d Destination) String() string {
 }
 
 // IsValid returns true if this Destination is valid.
+// 如果此目的地有效，则 IsValid 返回 true。
 func (d Destination) IsValid() bool {
 	return d.Network != Network_Unknown
 }

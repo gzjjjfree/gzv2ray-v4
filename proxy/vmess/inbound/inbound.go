@@ -41,6 +41,7 @@ type userByEmail struct {
 }
 
 func newUserByEmail(config *DefaultConfig) *userByEmail {
+	fmt.Println("in proxy-vmenss-inbound-inbound.go func newUserByEmail")
 	return &userByEmail{
 		cache:           make(map[string]*protocol.MemoryUser),
 		defaultLevel:    config.Level,
@@ -49,6 +50,7 @@ func newUserByEmail(config *DefaultConfig) *userByEmail {
 }
 
 func (v *userByEmail) addNoLock(u *protocol.MemoryUser) bool {
+	fmt.Println("in proxy-vmenss-inbound-inbound.go func (v *userByEmail) addNoLock")
 	email := strings.ToLower(u.Email)
 	_, found := v.cache[email]
 	if found {
@@ -66,6 +68,7 @@ func (v *userByEmail) Add(u *protocol.MemoryUser) bool {
 }
 
 func (v *userByEmail) Get(email string) (*protocol.MemoryUser, bool) {
+	fmt.Println("in proxy-vmenss-inbound-inbound.go func (v *userByEmail) Get")
 	email = strings.ToLower(email)
 
 	v.Lock()
@@ -116,6 +119,7 @@ type Handler struct {
 
 // New creates a new VMess inbound handler.
 func New(ctx context.Context, config *Config) (*Handler, error) {
+	fmt.Println("in proxy-vmenss-inbound-inbound.go func New")
 	v := core.MustFromContext(ctx)
 	handler := &Handler{
 		policyManager:         v.GetFeature(policy.ManagerType()).(policy.Manager),
@@ -182,6 +186,7 @@ func (h *Handler) RemoveUser(ctx context.Context, email string) error {
 }
 
 func transferResponse(timer signal.ActivityUpdater, session *encoding.ServerSession, request *protocol.RequestHeader, response *protocol.ResponseHeader, input buf.Reader, output *buf.BufferedWriter) error {
+	fmt.Println("in proxy-vmenss-inbound-inbound.go func transferResponse")
 	session.EncodeResponseHeader(response, output)
 
 	bodyWriter := session.EncodeResponseBody(request, output)
@@ -221,6 +226,7 @@ func isInsecureEncryption(s protocol.SecurityType) bool {
 
 // Process implements proxy.Inbound.Process().
 func (h *Handler) Process(ctx context.Context, network net.Network, connection internet.Connection, dispatcher routing.Dispatcher) error {
+	fmt.Println("in proxy-vmenss-inbound-inbound.go func  (h *Handler) Process")
 	sessionPolicy := h.policyManager.ForLevel(0)
 	if err := connection.SetReadDeadline(time.Now().Add(sessionPolicy.Timeouts.Handshake)); err != nil {
 		return newError("unable to set read deadline").Base(err).AtWarning()
@@ -320,6 +326,7 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 }
 
 func (h *Handler) generateCommand(ctx context.Context, request *protocol.RequestHeader) protocol.ResponseCommand {
+	fmt.Println("in proxy-vmenss-inbound-inbound.go func  (h *Handler) generateCommand")
 	if h.detours != nil {
 		tag := h.detours.To
 		if h.inboundHandlerManager != nil {
@@ -359,6 +366,7 @@ var aeadForced = false
 var aeadForced2022 = false
 
 func init() {
+	fmt.Println("in proxy-vmenss-inbound-inbound.go func init()")
 	common.Must(common.RegisterConfig((*Config)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		return New(ctx, config.(*Config))
 	}))
@@ -369,7 +377,7 @@ func init() {
 		defaultFlagValue = "true_by_default_2022"
 	}
 
-	isAeadForced := platform.NewEnvFlag("v2ray.vmess.aead.forced").GetValue(func() string { return defaultFlagValue })
+	isAeadForced := platform.NewEnvFlag("gzv2ray.vmess.aead.forced").GetValue(func() string { return defaultFlagValue })
 	if isAeadForced == "true" {
 		aeadForced = true
 	}

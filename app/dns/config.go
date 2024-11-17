@@ -4,6 +4,7 @@ package dns
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common/net"
 	"github.com/gzjjjfree/gzv2ray-v4/common/strmatcher"
@@ -38,6 +39,7 @@ var localTLDsAndDotlessDomainsRule = &NameServer_OriginalRule{
 }
 
 func toStrMatcher(t DomainMatchingType, domain string) (strmatcher.Matcher, error) {
+	fmt.Println("in app-dns-config.go func toStrMatcher")
 	strMType, f := typeMap[t]
 	if !f {
 		return nil, errors.New("unknown mapping type")
@@ -50,6 +52,7 @@ func toStrMatcher(t DomainMatchingType, domain string) (strmatcher.Matcher, erro
 }
 
 func toNetIP(addrs []net.Address) ([]net.IP, error) {
+	fmt.Println("in app-dns-config.go func toNetIP")
 	ips := make([]net.IP, 0, len(addrs))
 	for _, addr := range addrs {
 		if addr.Family().IsIP() {
@@ -63,5 +66,5 @@ func toNetIP(addrs []net.Address) ([]net.IP, error) {
 
 func generateRandomTag() string {
 	id := uuid.New()
-	return "v2ray.system." + id.String()
+	return "gzv2ray.system." + id.String()
 }

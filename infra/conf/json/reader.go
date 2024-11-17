@@ -1,7 +1,7 @@
 package json
 
 import (
-	"fmt"
+	//"fmt"
 	"io"
 
 	//"example.com/gztest"
@@ -37,7 +37,7 @@ type Reader struct {
 
 // Read implements io.Reader.Read(). Buffer must be at least 3 bytes.
 func (v *Reader) Read(b []byte) (int, error) {
-	fmt.Println("in infra-conf-json-reader.go func Read(b) ")
+	//fmt.Println("in infra-conf-json-reader.go func Read(b) ")
 	//gztest.GetMessageReflectType(v.br)
 
 	if v.br == nil {

@@ -4,6 +4,7 @@ package dns
 
 import (
 	"context"
+	"fmt"
 
 	core "github.com/gzjjjfree/gzv2ray-v4"
 	"github.com/gzjjjfree/gzv2ray-v4/common/net"
@@ -23,6 +24,7 @@ func (FakeDNSServer) Name() string {
 }
 
 func (f *FakeDNSServer) QueryIP(ctx context.Context, domain string, _ net.IP, _ dns.IPOption, _ bool) ([]net.IP, error) {
+	fmt.Println("in app-dns-nameserver_fakedns.go func (f *FakeDNSServer) QueryIP")
 	if f.fakeDNSEngine == nil {
 		if err := core.RequireFeatures(ctx, func(fd dns.FakeDNSEngine) {
 			f.fakeDNSEngine = fd

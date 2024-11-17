@@ -38,7 +38,7 @@ func New() *Buffer {
 		}
 		return r
 	case *[]byte:
-		fmt.Println("type is: *[]byte")
+		//fmt.Println("type is: *[]byte")
 		r := &Buffer{
 			v: *v,
 		}
@@ -55,13 +55,13 @@ func StackNew() Buffer {
 	data := pool.Get()	
 	switch v := data.(type) {
 	case []byte:
-		fmt.Println("type is: []byte")
+		//fmt.Println("type is: []byte")
 		r := Buffer{
 			v: v,
 		}
 		return r
 	case *[]byte:
-		fmt.Println("type is: *[]byte")
+		//fmt.Println("type is: *[]byte")
 		r := Buffer{
 			v: *v,
 		}

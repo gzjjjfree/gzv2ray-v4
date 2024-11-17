@@ -70,6 +70,7 @@ type dnsRequest struct {
 }
 
 func genEDNS0Options(clientIP net.IP) *dnsmessage.Resource {
+	fmt.Println("in app-dns-dnscommon.go func genEDNS0Options")
 	if len(clientIP) == 0 {
 		return nil
 	}
@@ -118,6 +119,7 @@ func genEDNS0Options(clientIP net.IP) *dnsmessage.Resource {
 }
 
 func buildReqMsgs(domain string, option dns_feature.IPOption, reqIDGen func() uint16, reqOpts *dnsmessage.Resource) []*dnsRequest {
+	fmt.Println("in app-dns-dnscommon.go func buildReqMsgs")
 	qA := dnsmessage.Question{
 		Name:  dnsmessage.MustNewName(domain),
 		Type:  dnsmessage.TypeA,
@@ -170,6 +172,7 @@ func buildReqMsgs(domain string, option dns_feature.IPOption, reqIDGen func() ui
 
 // parseResponse parse DNS answers from the returned payload
 func parseResponse(payload []byte) (*IPRecord, error) {
+	fmt.Println("in app-dns-dnscommon.go func parseResponse")
 	var parser dnsmessage.Parser
 	h, err := parser.Start(payload)
 	if err != nil {

@@ -13,7 +13,7 @@ func main() {
 		os.Exit(1)
 	}
 	pkg := filepath.Base(pwd)
-	if pkg == "v2ray-core" {
+	if pkg == "gzv2ray-core" {
 		pkg = "core"
 	}
 

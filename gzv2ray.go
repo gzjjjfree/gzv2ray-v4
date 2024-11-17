@@ -52,7 +52,7 @@ func (s *Instance) Start() error {
 		}
 	}
 
-	fmt.Println("V2Ray ", Version(), " started")
+	fmt.Println("GzV2Ray ", Version(), " started")
 
 	return nil
 }
@@ -111,7 +111,7 @@ func initInstanceWithConfig(config *Config, server *Instance) (bool, error) {
 		// 将字段 App 类型 []*serial.TypedMessage 转化为 protoreflect.ProtoMessage 类型
 		settings, err := appSettings.GetInstance()
 		if err != nil { // 如果返回不是没有错误，返回服务器设置错误为真
-			fmt.Println("in gzv2ray.go appSettings.GetInstance() ")
+			//fmt.Println("in gzv2ray.go appSettings.GetInstance() ")
 			return true, err
 		}
 
@@ -122,12 +122,12 @@ func initInstanceWithConfig(config *Config, server *Instance) (bool, error) {
 			fmt.Println("in gzv2ray CreateObject(server, settings) ")
 			return true, err
 		}
-		fmt.Println("in gzv2ray.go feature  ")
+		//fmt.Println("in gzv2ray.go feature  ")
 		// 检查接口是否实现 v2ray 的实例类型
 		if feature, ok := obj.(features.Feature); ok {
 			// fmt.Println("in gzv2ray.go feature ok ")
 			if err := server.AddFeature(feature); err != nil {
-				fmt.Println("in gzv2ray server.AddFeature(feature) ")
+				//fmt.Println("in gzv2ray server.AddFeature(feature) ")
 				return true, err
 			}
 		}
@@ -233,7 +233,7 @@ func (s *Instance) AddFeature(feature features.Feature) error {
 }
 
 func (r *resolution) resolve(allFeatures []features.Feature) (bool, error) { // resoleve 解析接口
-	fmt.Println("in gzv2ray.go func (r *resolution) resolve")
+	//fmt.Println("in gzv2ray.go func (r *resolution) resolve")
 	//gztest.GetMessageReflectType(r.deps)
 	var fs []features.Feature
 	// r 是  Feature 类型列表及回调函数
@@ -290,7 +290,7 @@ func (r *resolution) resolve(allFeatures []features.Feature) (bool, error) { // 
 // GetFeature returns a feature of the given type, or nil if such feature is not registered.
 // GetFeature 返回给定类型的特征，如果该特征未注册，则返回 nil。
 func (s *Instance) GetFeature(featureType interface{}) features.Feature {
-	fmt.Println("in gzv2ray.go func (s *Instance) GetFeature(featureType interface{})")
+	//fmt.Println("in gzv2ray.go func (s *Instance) GetFeature(featureType interface{})")
 	return getFeature(s.features, reflect.TypeOf(featureType))
 }
 
@@ -342,6 +342,7 @@ func AddInboundHandler(server *Instance, config *InboundHandlerConfig) error {
 // See Instance.RequireFeatures for more information.
 // 查看 Instance.RequireFeatures 以了解更多信息。
 func RequireFeatures(ctx context.Context, callback interface{}) error {
+	fmt.Println("in gzv2ray.go func RequireFeatures")
 	v := MustFromContext(ctx)
 	return v.RequireFeatures(callback)
 }
@@ -380,6 +381,7 @@ func (s *Instance) RequireFeatures(callback interface{}) error {
 }
 
 func addOutboundHandlers(server *Instance, configs []*OutboundHandlerConfig) error {
+	fmt.Println("in gzv2ray.go addOutboundHandlers")
 	for _, outboundConfig := range configs {
 		if err := AddOutboundHandler(server, outboundConfig); err != nil {
 			return err
@@ -390,6 +392,7 @@ func addOutboundHandlers(server *Instance, configs []*OutboundHandlerConfig) err
 }
 
 func AddOutboundHandler(server *Instance, config *OutboundHandlerConfig) error {
+	fmt.Println("in gzv2ray.go AddOutboundHandler")
 	outboundManager := server.GetFeature(outbound.ManagerType()).(outbound.Manager)
 	rawHandler, err := CreateObject(server, config)
 	if err != nil {

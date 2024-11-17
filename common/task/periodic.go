@@ -52,8 +52,9 @@ func (t *Periodic) checkedExecute() error {
 }
 
 // Start implements common.Runnable.
+// 开始实现 common.Runnable。
 func (t *Periodic) Start() error {
-	fmt.Println("in common-task-periodic.go func Start()")
+	fmt.Println("in common-task-periodic.go func (t *Periodic) Start()")
 	t.access.Lock()
 	if t.running {
 		t.access.Unlock()

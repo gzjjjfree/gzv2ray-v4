@@ -59,7 +59,7 @@ func isPacketReader(reader io.Reader) bool {
 // The Reader instance doesn't take the ownership of reader.
 // Reader 实例不拥有 reader 的所有权。
 func NewReader(reader io.Reader) Reader {
-	fmt.Println("in common-buf-io.go func NewReader ")
+	//fmt.Println("in common-buf-io.go func NewReader ")
 	if mr, ok := reader.(Reader); ok {
 		return mr
 	}

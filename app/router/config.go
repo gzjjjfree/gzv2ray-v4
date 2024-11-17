@@ -3,6 +3,8 @@
 package router
 
 import (
+	"fmt"
+
 	"github.com/gzjjjfree/gzv2ray-v4/common/net"
 	"github.com/gzjjjfree/gzv2ray-v4/features/outbound"
 	"github.com/gzjjjfree/gzv2ray-v4/features/routing"
@@ -18,6 +20,7 @@ func (l *CIDRList) Len() int {
 
 // Less implements sort.Interface.
 func (l *CIDRList) Less(i int, j int) bool {
+	//fmt.Println("in app-router-config.go func (l *CIDRList) Less i: ", i, " j: ", j)
 	ci := (*l)[i]
 	cj := (*l)[j]
 
@@ -66,6 +69,7 @@ func (r *Rule) Apply(ctx routing.Context) bool {
 }
 
 func (rr *RoutingRule) BuildCondition() (Condition, error) {
+	//fmt.Println("in app-router-config.go func (rr *RoutingRule) BuildCondition()")
 	conds := NewConditionChan()
 
 	if len(rr.Domain) > 0 {
@@ -160,6 +164,7 @@ func (rr *RoutingRule) BuildCondition() (Condition, error) {
 }
 
 func (br *BalancingRule) Build(ohm outbound.Manager) (*Balancer, error) {
+	fmt.Println("in app-router-config.go func (br *BalancingRule) Build")
 	return &Balancer{
 		selectors: br.OutboundSelector,
 		strategy:  &RandomStrategy{},

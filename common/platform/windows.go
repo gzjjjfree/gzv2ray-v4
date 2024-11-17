@@ -14,7 +14,7 @@ func LineSeparator() string {
 }
 
 func GetToolLocation(file string) string {
-	const name = "v2ray.location.tool"
+	const name = "gzv2ray.location.tool"
 	toolPath := EnvFlag{Name: name, AltName: NormalizeEnvName(name)}.GetValue(getExecutableDir)
 	return filepath.Join(toolPath, file+".exe")
 }

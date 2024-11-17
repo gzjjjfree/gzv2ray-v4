@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"context"
 	"time"
+	"fmt"
 
 	core "github.com/gzjjjfree/gzv2ray-v4"
 	"github.com/gzjjjfree/gzv2ray-v4/common"
@@ -39,6 +40,7 @@ type Server struct {
 }
 
 func NewServer(ctx context.Context, config *ServerConfig) (*Server, error) {
+	fmt.Println("in proxy-mtproto-server.go func NewServer")
 	if len(config.User) == 0 {
 		return nil, newError("no user configured.")
 	}
@@ -80,6 +82,7 @@ func isValidConnectionType(c [4]byte) bool {
 }
 
 func (s *Server) Process(ctx context.Context, network net.Network, conn internet.Connection, dispatcher routing.Dispatcher) error {
+	fmt.Println("in proxy-mtproto-server.go func (s *Server) Process")
 	sPolicy := s.policy.ForLevel(s.user.Level)
 
 	if err := conn.SetDeadline(time.Now().Add(sPolicy.Timeouts.Handshake)); err != nil {
@@ -157,6 +160,7 @@ func (s *Server) Process(ctx context.Context, network net.Network, conn internet
 }
 
 func init() {
+	fmt.Println("in proxy-mtproto-server.go func init")
 	common.Must(common.RegisterConfig((*ServerConfig)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		return NewServer(ctx, config.(*ServerConfig))
 	}))

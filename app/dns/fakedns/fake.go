@@ -65,6 +65,7 @@ func (fkdns *Holder) initializeFromConfig() error {
 }
 
 func (fkdns *Holder) initialize(ipPoolCidr string, lruSize int) error {
+	fmt.Println("in app--dns-fakedns-fake.go func (fkdns *Holder) initialize")
 	var ipRange *gonet.IPNet
 	var ipaddr gonet.IP
 	var currentIP *big.Int
@@ -92,6 +93,7 @@ func (fkdns *Holder) initialize(ipPoolCidr string, lruSize int) error {
 
 // GetFakeIPForDomain check and generate a fake IP for a domain name
 func (fkdns *Holder) GetFakeIPForDomain(domain string) []net.Address {
+	fmt.Println("in app--dns-fakedns-fake.go func (fkdns *Holder) GetFakeIPForDomain")
 	if v, ok := fkdns.domainToIP.Get(domain); ok {
 		return []net.Address{v.(net.Address)}
 	}
@@ -115,6 +117,7 @@ func (fkdns *Holder) GetFakeIPForDomain(domain string) []net.Address {
 
 // GetDomainFromFakeDNS check if an IP is a fake IP and have corresponding domain name
 func (fkdns *Holder) GetDomainFromFakeDNS(ip net.Address) string {
+	fmt.Println("in app--dns-fakedns-fake.go func (fkdns *Holder) GetDomainFromFakeDNS")
 	if !ip.Family().IsIP() || !fkdns.ipRange.Contains(ip.IP()) {
 		return ""
 	}

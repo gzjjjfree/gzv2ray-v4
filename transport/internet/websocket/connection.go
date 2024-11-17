@@ -53,6 +53,7 @@ func newConnectionWithEarlyData(conn *websocket.Conn, remoteAddr net.Addr, early
 }
 
 func newConnectionWithDelayedDial(dialer DelayedDialer) *connection {
+	fmt.Println("in transport-internet-websocket-connection.go func newConnectionWithDelayedDial")
 	delayedDialContext, CancellFunc := context.WithCancel(context.Background())
 	return &connection{
 		shouldWait:        true,
@@ -63,6 +64,7 @@ func newConnectionWithDelayedDial(dialer DelayedDialer) *connection {
 }
 
 func newRelayedConnectionWithDelayedDial(dialer DelayedDialerForwarded) *connectionForwarder {
+	fmt.Println("in transport-internet-websocket-connection.go func newRelayedConnectionWithDelayedDial")
 	delayedDialContext, CancellFunc := context.WithCancel(context.Background())
 	return &connectionForwarder{
 		shouldWait:        true,
@@ -73,6 +75,7 @@ func newRelayedConnectionWithDelayedDial(dialer DelayedDialerForwarded) *connect
 }
 
 func newRelayedConnection(conn io.ReadWriteCloser) *connectionForwarder {
+	fmt.Println("in transport-internet-websocket-connection.go func newRelayedConnection")
 	return &connectionForwarder{
 		ReadWriteCloser: conn,
 		shouldWait:      false,
@@ -97,6 +100,7 @@ func (c *connection) Read(b []byte) (int, error) {
 }
 
 func (c *connection) getReader() (io.Reader, error) {
+	//fmt.Println("in transport-internet-websocket-connection.go func (c *connection) getReader()")
 	if c.shouldWait {
 		<-c.delayedDialFinish.Done()
 		if c.conn == nil {
@@ -117,6 +121,7 @@ func (c *connection) getReader() (io.Reader, error) {
 
 // Write implements io.Writer.
 func (c *connection) Write(b []byte) (int, error) {
+	//fmt.Println("in transport-internet-websocket-connection.go func (c *connection) Write")
 	if c.shouldWait {
 		var err error
 		c.conn, err = c.dialer.Dial(b)

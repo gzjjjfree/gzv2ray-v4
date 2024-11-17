@@ -73,13 +73,13 @@ func getExecutableSubDir(dir string) func() string {
 }
 
 func GetPluginDirectory() string {
-	const name = "v2ray.location.plugin"
+	const name = "gzv2ray.location.plugin"
 	pluginDir := NewEnvFlag(name).GetValue(getExecutableSubDir("plugins"))
 	return pluginDir
 }
 
 func GetConfigurationPath() string {
-	const name = "v2ray.location.config"
+	const name = "gzv2ray.location.config"
 	configPath := NewEnvFlag(name).GetValue(getExecutableDir)
 	return filepath.Join(configPath, "config.json")
 }

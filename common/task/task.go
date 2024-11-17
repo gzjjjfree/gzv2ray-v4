@@ -2,12 +2,14 @@ package task
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common/signal/semaphore"
 )
 
 // OnSuccess executes g() after f() returns nil.
 func OnSuccess(f func() error, g func() error) func() error {
+	fmt.Println("in common-task-task.go func OnSuccess")
 	return func() error {
 		if err := f(); err != nil {
 			return err
@@ -18,6 +20,7 @@ func OnSuccess(f func() error, g func() error) func() error {
 
 // Run executes a list of tasks in parallel, returns the first error encountered or nil if all tasks pass.
 func Run(ctx context.Context, tasks ...func() error) error {
+	fmt.Println("in common-task-task.go func Run")
 	n := len(tasks)
 	s := semaphore.New(n)
 	done := make(chan error, 1)

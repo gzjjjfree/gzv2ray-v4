@@ -7,6 +7,7 @@ import (
 	"context"
 	"sync/atomic"
 	"time"
+	"fmt"
 
 	core "github.com/gzjjjfree/gzv2ray-v4"
 	"github.com/gzjjjfree/gzv2ray-v4/common"
@@ -23,6 +24,7 @@ import (
 )
 
 func init() {
+	fmt.Println("in proxy-dokodemo-dokodemo.go func init()")
 	common.Must(common.RegisterConfig((*Config)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		d := new(Door)
 		err := core.RequireFeatures(ctx, func(pm policy.Manager) error {
@@ -42,6 +44,7 @@ type Door struct {
 
 // Init initializes the Door instance with necessary parameters.
 func (d *Door) Init(config *Config, pm policy.Manager, sockopt *session.Sockopt) error {
+	fmt.Println("in proxy-dokodemo-dokodemo.go func (d *Door) Init")
 	if (config.NetworkList == nil || len(config.NetworkList.Network) == 0) && len(config.Networks) == 0 {
 		return newError("no network specified")
 	}
@@ -56,6 +59,7 @@ func (d *Door) Init(config *Config, pm policy.Manager, sockopt *session.Sockopt)
 
 // Network implements proxy.Inbound.
 func (d *Door) Network() []net.Network {
+	fmt.Println("in proxy-dokodemo-dokodemo.go func (d *Door) Network()")
 	if len(d.config.Networks) > 0 {
 		return d.config.Networks
 	}
@@ -64,6 +68,7 @@ func (d *Door) Network() []net.Network {
 }
 
 func (d *Door) policy() policy.Session {
+	fmt.Println("in proxy-dokodemo-dokodemo.go func (d *Door) policy()")
 	config := d.config
 	p := d.policyManager.ForLevel(config.UserLevel)
 	if config.Timeout > 0 && config.UserLevel == 0 {
@@ -78,6 +83,7 @@ type hasHandshakeAddress interface {
 
 // Process implements proxy.Inbound.
 func (d *Door) Process(ctx context.Context, network net.Network, conn internet.Connection, dispatcher routing.Dispatcher) error {
+	fmt.Println("in proxy-dokodemo-dokodemo.go func (d *Door) Process")
 	newError("processing connection from: ", conn.RemoteAddr())
 	dest := net.Destination{
 		Network: network,

@@ -2,6 +2,7 @@ package command
 
 import (
 	"strings"
+	"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common/net"
 	"github.com/gzjjjfree/gzv2ray-v4/features/routing"
@@ -29,9 +30,12 @@ func (c routingContext) GetTargetPort() net.Port {
 }
 
 // GetSkipDNSResolve is a mock implementation here to match the interface,
+// GetSkipDNSResolve 是一个模拟实现，用于匹配接口，
 // SkipDNSResolve is set from dns module, no use if coming from a protobuf object?
+// SkipDNSResolve 是从 dns 模块设置的，如果来自 protobuf 对象则没有用？
 // TODO: please confirm @Vigilans
 func (c routingContext) GetSkipDNSResolve() bool {
+	fmt.Println("in app-routerr-command-config.go func (c routingContext) GetSkipDNSResolve()")
 	return false
 }
 
@@ -62,6 +66,7 @@ var fieldMap = map[string]func(*RoutingContext, routing.Route){
 
 // AsProtobufMessage takes selectors of fields and returns a function to convert routing.Route to protobuf RoutingContext.
 func AsProtobufMessage(fieldSelectors []string) func(routing.Route) *RoutingContext {
+	fmt.Println("in app-router-command-command.go func AsProtobufMessage")
 	initializers := []func(*RoutingContext, routing.Route){}
 	for field, init := range fieldMap {
 		if len(fieldSelectors) == 0 { // If selectors not set, retrieve all fields

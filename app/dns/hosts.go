@@ -4,6 +4,7 @@ package dns
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common"
 	"github.com/gzjjjfree/gzv2ray-v4/common/net"
@@ -20,6 +21,7 @@ type StaticHosts struct {
 
 // NewStaticHosts creates a new StaticHosts instance.
 func NewStaticHosts(hosts []*Config_HostMapping, legacy map[string]*net.IPOrDomain) (*StaticHosts, error) {
+	fmt.Println("in app-dns-hosts.go func NewStaticHosts")
 	g := new(strmatcher.MatcherGroup)
 	sh := &StaticHosts{
 		ips:      make([][]net.Address, len(hosts)+len(legacy)+16),
@@ -79,6 +81,7 @@ func NewStaticHosts(hosts []*Config_HostMapping, legacy map[string]*net.IPOrDoma
 }
 
 func filterIP(ips []net.Address, option dns.IPOption) []net.Address {
+	fmt.Println("in app-dns-hosts.go func filterIP")
 	filtered := make([]net.Address, 0, len(ips))
 	for _, ip := range ips {
 		if (ip.Family().IsIPv4() && option.IPv4Enable) || (ip.Family().IsIPv6() && option.IPv6Enable) {
@@ -97,6 +100,7 @@ func (h *StaticHosts) lookupInternal(domain string) []net.Address {
 }
 
 func (h *StaticHosts) lookup(domain string, option dns.IPOption, maxDepth int) []net.Address {
+	fmt.Println("in app-dns-hosts.go func (h *StaticHosts) lookup")
 	switch addrs := h.lookupInternal(domain); {
 	case len(addrs) == 0: // Not recorded in static hosts, return nil
 		return nil

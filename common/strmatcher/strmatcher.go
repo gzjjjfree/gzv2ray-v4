@@ -2,6 +2,7 @@ package strmatcher
 
 import (
 	"regexp"
+	"fmt"
 )
 
 // Matcher is the interface to determine a string matches a pattern.
@@ -90,6 +91,7 @@ func (g *MatcherGroup) Add(m Matcher) uint32 {
 
 // Match implements IndexMatcher.Match.
 func (g *MatcherGroup) Match(pattern string) []uint32 {
+	fmt.Println("in common-strmatcher-strmatcher.go func (g *MatcherGroup) Match pattern is: ", pattern)
 	result := []uint32{}
 	result = append(result, g.fullMatcher.Match(pattern)...)
 	result = append(result, g.domainMatcher.Match(pattern)...)
@@ -98,6 +100,7 @@ func (g *MatcherGroup) Match(pattern string) []uint32 {
 			result = append(result, e.id)
 		}
 	}
+	fmt.Println("in common-strmatcher-strmatcher.go func (g *MatcherGroup) Match result is: ", result)
 	return result
 }
 

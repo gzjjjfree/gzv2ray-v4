@@ -4,7 +4,7 @@ package core
 
 import (
 	"context"
-	"fmt"
+	//"fmt"
 )
 
 /* toContext returns ctx from the given context, or creates an Instance if the context doesn't find that.
@@ -25,11 +25,7 @@ func toContext(ctx context.Context, v *Instance) context.Context {
 	if FromContext(ctx) != v {
 		//fmt.Println("in context.go func toContext FromContext(ctx) != v")
 		ctx = context.WithValue(ctx, gzv2rayKey, v)
-		if v.featureResolutions == nil {
-			fmt.Println("in context.go func toContext v.featureResolutions == nil")
-		} else {
-			fmt.Println("in context.go func toContext v.featureResolutions != nil")
-		}
+		
 	}
 	return ctx
 }

@@ -42,13 +42,14 @@ type DomainMatcherInfo struct {
 
 // New creates a new DNS server with given configuration.
 func New(ctx context.Context, config *Config) (*DNS, error) {
+	fmt.Println("in app-dns-dns.go func New config is: ", config)
 	var tag string
 	if len(config.Tag) > 0 {
 		tag = config.Tag
 	} else {
 		tag = generateRandomTag()
 	}
-
+	fmt.Println("in app-dns-dns.go func New tag is: ", tag)
 	var clientIP net.IP
 	switch len(config.ClientIp) {
 	case 0, net.IPv4len, net.IPv6len:
@@ -196,6 +197,7 @@ func (s *DNS) LookupIPv6(domain string) ([]net.IP, error) {
 }
 
 func (s *DNS) lookupIPInternal(domain string, option dns.IPOption) ([]net.IP, error) {
+	fmt.Println("in app-dns-dns.go func (s *DNS) lookupIPInternal")
 	if domain == "" {
 		return nil, errors.New("empty domain name")
 	}
@@ -260,6 +262,7 @@ func (s *DNS) SetFakeDNSOption(isFakeEnable bool) {
 }
 
 func (s *DNS) sortClients(domain string) []*Client {
+	fmt.Println("in app-dns-dns.go func (s *DNS) sortClients")
 	clients := make([]*Client, 0, len(s.clients))
 	clientUsed := make([]bool, len(s.clients))
 	clientNames := make([]string, 0, len(s.clients))

@@ -24,12 +24,12 @@ func GetToolLocation(file string) string {
 
 // GetAssetLocation search for `file` in certain locations
 func GetAssetLocation(file string) string {
-	const name = "v2ray.location.asset"
+	const name = "gzv2ray.location.asset"
 	assetPath := NewEnvFlag(name).GetValue(getExecutableDir)
 	defPath := filepath.Join(assetPath, file)
 	for _, p := range []string{
 		defPath,
-		filepath.Join("/usr/local/v2ray/", file),
+		filepath.Join("/usr/local/gzv2ray/", file),
 	} {
 		if _, err := os.Stat(p); err != nil && errors.Is(os.ErrNotExist, err) {
 			continue

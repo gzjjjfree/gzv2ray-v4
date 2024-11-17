@@ -8,6 +8,7 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+	"fmt"
 
 	"golang.org/x/net/dns/dnsmessage"
 
@@ -38,6 +39,7 @@ type ClassicNameServer struct {
 
 // NewClassicNameServer creates udp server object for remote resolving.
 func NewClassicNameServer(address net.Destination, dispatcher routing.Dispatcher) *ClassicNameServer {
+	fmt.Println("in app-dns-nameserver_udp.go func NewClassicNameServer")
 	// default to 53 if unspecific
 	if address.Port == 0 {
 		address.Port = net.Port(53)
@@ -66,6 +68,7 @@ func (s *ClassicNameServer) Name() string {
 
 // Cleanup clears expired items from cache
 func (s *ClassicNameServer) Cleanup() error {
+	fmt.Println("in app-dns-nameserver_udp.go func (s *ClassicNameServer) Cleanup()")
 	now := time.Now()
 	s.Lock()
 	defer s.Unlock()
@@ -108,6 +111,7 @@ func (s *ClassicNameServer) Cleanup() error {
 
 // HandleResponse handles udp response packet from remote DNS server.
 func (s *ClassicNameServer) HandleResponse(ctx context.Context, packet *udp_proto.Packet) {
+	fmt.Println("in app-dns-nameserver_udp.go func (s *ClassicNameServer) HandleResponse")
 	ipRec, err := parseResponse(packet.Payload.Bytes())
 	if err != nil {
 		newError(s.name, " fail to parse responded DNS udp").AtError().WriteToLog()
@@ -143,6 +147,7 @@ func (s *ClassicNameServer) HandleResponse(ctx context.Context, packet *udp_prot
 }
 
 func (s *ClassicNameServer) updateIP(domain string, newRec record) {
+	fmt.Println("in app-dns-nameserver_udp.go func (s *ClassicNameServer) updateIP")
 	s.Lock()
 
 	newError(s.name, " updating IP records for domain:", domain).AtDebug().WriteToLog()
@@ -185,6 +190,7 @@ func (s *ClassicNameServer) addPendingRequest(req *dnsRequest) {
 }
 
 func (s *ClassicNameServer) sendQuery(ctx context.Context, domain string, clientIP net.IP, option dns_feature.IPOption) {
+	fmt.Println("in app-dns-nameserver_udp.go func (s *ClassicNameServer) sendQuery")
 	newError(s.name, " querying DNS for: ", domain)
 
 	reqs := buildReqMsgs(domain, option, s.newReqID, genEDNS0Options(clientIP))
@@ -204,6 +210,7 @@ func (s *ClassicNameServer) sendQuery(ctx context.Context, domain string, client
 }
 
 func (s *ClassicNameServer) findIPsForDomain(domain string, option dns_feature.IPOption) ([]net.IP, error) {
+	fmt.Println("in app-dns-nameserver_udp.go func (s *ClassicNameServer) findIPsForDomain")
 	s.RLock()
 	record, found := s.ips[domain]
 	s.RUnlock()
@@ -243,6 +250,7 @@ func (s *ClassicNameServer) findIPsForDomain(domain string, option dns_feature.I
 
 // QueryIP implements Server.
 func (s *ClassicNameServer) QueryIP(ctx context.Context, domain string, clientIP net.IP, option dns_feature.IPOption, disableCache bool) ([]net.IP, error) {
+	fmt.Println("in app-dns-nameserver_udp.go func (s *ClassicNameServer) QueryIP")
 	fqdn := Fqdn(domain)
 
 	if disableCache {

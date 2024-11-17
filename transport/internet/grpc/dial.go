@@ -8,6 +8,7 @@ import (
 	gonet "net"
 	"sync"
 	"time"
+	"fmt"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
@@ -23,6 +24,7 @@ import (
 )
 
 func Dial(ctx context.Context, dest net.Destination, streamSettings *internet.MemoryStreamConfig) (internet.Connection, error) {
+	fmt.Println("in transport-internet-grpc-dial.go func Dial")
 	newError("creating connection to ", dest).WriteToLog(session.ExportIDToError(ctx))
 
 	conn, err := dialgRPC(ctx, dest, streamSettings)
@@ -33,6 +35,7 @@ func Dial(ctx context.Context, dest net.Destination, streamSettings *internet.Me
 }
 
 func init() {
+	fmt.Println("in transport-internet-grpc-dial.go func init()")
 	common.Must(internet.RegisterTransportDialer(protocolName, Dial))
 }
 
@@ -42,6 +45,7 @@ var (
 )
 
 func dialgRPC(ctx context.Context, dest net.Destination, streamSettings *internet.MemoryStreamConfig) (net.Conn, error) {
+	fmt.Println("in transport-internet-grpc-dial.go func dialgRPC")
 	grpcSettings := streamSettings.ProtocolSettings.(*Config)
 
 	config := tls.ConfigFromStreamSettings(streamSettings)
@@ -65,6 +69,7 @@ func dialgRPC(ctx context.Context, dest net.Destination, streamSettings *interne
 }
 
 func getGrpcClient(dest net.Destination, dialOption grpc.DialOption) (*grpc.ClientConn, error) {
+	fmt.Println("in transport-internet-grpc-dial.go func getGrpcClient")
 	globalDialerAccess.Lock()
 	defer globalDialerAccess.Unlock()
 

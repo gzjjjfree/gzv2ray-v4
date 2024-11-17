@@ -2,6 +2,7 @@ package session
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common/net"
 	"github.com/gzjjjfree/gzv2ray-v4/common/session"
@@ -46,6 +47,7 @@ func (ctx *Context) GetSourcePort() net.Port {
 
 // GetTargetIPs implements routing.Context.
 func (ctx *Context) GetTargetIPs() []net.IP {
+	fmt.Println("in features-routing-session-context.go func  (ctx *Context) GetTargetIPs()")
 	if ctx.Outbound == nil || !ctx.Outbound.Target.IsValid() {
 		return nil
 	}
@@ -67,6 +69,7 @@ func (ctx *Context) GetTargetPort() net.Port {
 
 // GetTargetDomain implements routing.Context.
 func (ctx *Context) GetTargetDomain() string {
+	fmt.Println("in features-routing-session-context.go func (ctx *Context) GetTargetDomain()")
 	if ctx.Outbound == nil || !ctx.Outbound.Target.IsValid() {
 		return ""
 	}
@@ -103,6 +106,7 @@ func (ctx *Context) GetUser() string {
 
 // GetAttributes implements routing.Context.
 func (ctx *Context) GetAttributes() map[string]string {
+	fmt.Println("in features-routing-session-context.go func (ctx *Context) GetAttributes()")
 	if ctx.Content == nil {
 		return nil
 	}
@@ -111,6 +115,7 @@ func (ctx *Context) GetAttributes() map[string]string {
 
 // GetSkipDNSResolve implements routing.Context.
 func (ctx *Context) GetSkipDNSResolve() bool {
+	fmt.Println("in features-routing-session-context.go func (ctx *Context) GetSkipDNSResolve()")
 	if ctx.Content == nil {
 		return false
 	}
@@ -119,6 +124,7 @@ func (ctx *Context) GetSkipDNSResolve() bool {
 
 // AsRoutingContext creates a context from context.context with session info.
 func AsRoutingContext(ctx context.Context) routing.Context {
+	fmt.Println("in features-routing-session-context.go func AsRoutingContext")
 	return &Context{
 		Inbound:  session.InboundFromContext(ctx),
 		Outbound: session.OutboundFromContext(ctx),

@@ -4,6 +4,7 @@ package dns
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common/net"
 	"github.com/gzjjjfree/gzv2ray-v4/features/dns"
@@ -17,6 +18,7 @@ type LocalNameServer struct {
 
 // QueryIP implements Server.
 func (s *LocalNameServer) QueryIP(_ context.Context, domain string, _ net.IP, option dns.IPOption, _ bool) ([]net.IP, error) {
+	fmt.Println("in app-dns-nameserver_local.go func (s *LocalNameServer) QueryIP")
 	var ips []net.IP
 	var err error
 

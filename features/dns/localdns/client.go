@@ -1,6 +1,8 @@
 package localdns
 
 import (
+	"fmt"
+
 	"github.com/gzjjjfree/gzv2ray-v4/features/dns"
 	"github.com/gzjjjfree/gzv2ray-v4/common/net"
 )
@@ -27,6 +29,7 @@ func (*Client) Close() error { return nil }
 
 // LookupIP implements Client.
 func (*Client) LookupIP(host string) ([]net.IP, error) {
+	fmt.Println("in deatures-dns-localdns-client.go func (*Client) LookupIP")
 	ips, err := net.LookupIP(host)
 	if err != nil {
 		return nil, err
@@ -46,6 +49,7 @@ func (*Client) LookupIP(host string) ([]net.IP, error) {
 
 // LookupIPv4 implements IPv4Lookup.
 func (c *Client) LookupIPv4(host string) ([]net.IP, error) {
+	fmt.Println("in deatures-dns-localdns-client.go func  (c *Client) LookupIPv4")	
 	ips, err := c.LookupIP(host)
 	if err != nil {
 		return nil, err
@@ -64,6 +68,7 @@ func (c *Client) LookupIPv4(host string) ([]net.IP, error) {
 
 // LookupIPv6 implements IPv6Lookup.
 func (c *Client) LookupIPv6(host string) ([]net.IP, error) {
+	fmt.Println("in deatures-dns-localdns-client.go func (c *Client) LookupIPv6")	
 	ips, err := c.LookupIP(host)
 	if err != nil {
 		return nil, err

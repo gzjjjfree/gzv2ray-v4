@@ -28,7 +28,7 @@ func readOneUDP(r io.Reader) (*Buffer, error) {
 
 // ReadBuffer reads a Buffer from the given reader.
 func ReadBuffer(r io.Reader) (*Buffer, error) {
-	fmt.Println("in common-buf-reader.go func ReadBuffer")
+	//fmt.Println("in common-buf-reader.go func ReadBuffer")
 	b := New()
 	n, err := b.ReadFrom(r)
 	if n > 0 {
@@ -91,7 +91,7 @@ func (r *BufferedReader) Read(b []byte) (int, error) {
 
 // ReadMultiBuffer implements Reader.
 func (r *BufferedReader) ReadMultiBuffer() (MultiBuffer, error) {
-	fmt.Println("in common-buf-reader.go func (r *BufferedReader) ReadMultiBuffer()")
+	//fmt.Println("in common-buf-reader.go func (r *BufferedReader) ReadMultiBuffer()")
 	if !r.Buffer.IsEmpty() {
 		mb := r.Buffer
 		r.Buffer = nil
@@ -103,7 +103,7 @@ func (r *BufferedReader) ReadMultiBuffer() (MultiBuffer, error) {
 
 // ReadAtMost returns a MultiBuffer with at most size.
 func (r *BufferedReader) ReadAtMost(size int32) (MultiBuffer, error) {
-	fmt.Println("in common-buf-reader.go func ReadAtMost(size int32)")
+	//fmt.Println("in common-buf-reader.go func ReadAtMost(size int32)")
 	if r.Buffer.IsEmpty() {
 		mb, err := r.Reader.ReadMultiBuffer()
 		if mb.IsEmpty() && err != nil {
@@ -165,7 +165,7 @@ type SingleReader struct {
 
 // ReadMultiBuffer implements Reader.
 func (r *SingleReader) ReadMultiBuffer() (MultiBuffer, error) {
-	fmt.Println("in common-buf-reader.go func  (r *SingleReader) ReadMultiBuffer()")
+	//fmt.Println("in common-buf-reader.go func  (r *SingleReader) ReadMultiBuffer()")
 	b, err := ReadBuffer(r.Reader)
 	return MultiBuffer{b}, err
 }

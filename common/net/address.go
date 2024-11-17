@@ -193,7 +193,9 @@ func (d *IPOrDomain) AsAddress() Address {
 }
 
 // NewIPOrDomain translates Address to IPOrDomain
+// NewIPOrDomain 将 Address 转换为 IPOrDomain
 func NewIPOrDomain(addr Address) *IPOrDomain {
+	fmt.Println("in common-net-address.go func  NewIPOrDomain addr: ", addr)
 	switch addr.Family() {
 	case AddressFamilyDomain:
 		return &IPOrDomain{

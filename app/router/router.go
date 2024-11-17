@@ -33,6 +33,7 @@ type Route struct {
 
 // Init initializes the Router.
 func (r *Router) Init(config *Config, d dns.Client, ohm outbound.Manager) error {
+	fmt.Println("in app-router-router.go func (r *Router) Init")
 	r.domainStrategy = config.DomainStrategy
 	r.dns = d
 
@@ -71,11 +72,13 @@ func (r *Router) Init(config *Config, d dns.Client, ohm outbound.Manager) error 
 
 // PickRoute implements routing.Router.
 func (r *Router) PickRoute(ctx routing.Context) (routing.Route, error) {
+	fmt.Println("in app-router-router.go func (r *Router) PickRoute")
 	rule, ctx, err := r.pickRouteInternal(ctx)
 	if err != nil {
 		return nil, err
 	}
 	tag, err := rule.GetTag()
+	fmt.Println("in app-router-router.go func (r *Router) PickRoute tag is: ", tag)
 	if err != nil {
 		return nil, err
 	}
@@ -83,27 +86,33 @@ func (r *Router) PickRoute(ctx routing.Context) (routing.Route, error) {
 }
 
 func (r *Router) pickRouteInternal(ctx routing.Context) (*Rule, routing.Context, error) {
+	fmt.Println("in app-router-router.go func (r *Router) pickRouteInternal GetTargetIPs(): ", ctx.GetTargetIPs(), " GetTargetDomain(): ", ctx.GetTargetDomain())
 	// SkipDNSResolve is set from DNS module.
 	// the DOH remote server maybe a domain name,
 	// this prevents cycle resolving dead loop
 	skipDNSResolve := ctx.GetSkipDNSResolve()
-
+	fmt.Println("in app-router-router.go func (r *Router) pickRouteInternal skipDNSResolve is: ", skipDNSResolve)
 	if r.domainStrategy == Config_IpOnDemand && !skipDNSResolve {
+		fmt.Println("in app-router-router.go func (r *Router) pickRouteInternal !skipDNSResolve")
 		ctx = routing_dns.ContextWithDNSClient(ctx, r.dns)
 	}
-
+	fmt.Println("in app-router-router.go func (r *Router) pickRouteInternal 匹配查找域名？")
+	// 根据路由规则匹配域名确定出站 tag
 	for _, rule := range r.rules {
 		if rule.Apply(ctx) {
 			return rule, ctx, nil
 		}
 	}
 
+	// 当域名不匹配或config 设置不是遇到 IP 规则请求 DNS 或没有 DNS 设置时
 	if r.domainStrategy != Config_IpIfNonMatch || len(ctx.GetTargetDomain()) == 0 || skipDNSResolve {
+		fmt.Println("in app-router-router.go func (r *Router) pickRouteInternal len(ctx.GetTargetDomain()) == 0")
 		return nil, ctx, common.ErrNoClue
 	}
 
 	ctx = routing_dns.ContextWithDNSClient(ctx, r.dns)
-
+// 根据路由规则匹配 IP 确定出站 tag
+	fmt.Println("in app-router-router.go func (r *Router) pickRouteInternal 匹配查找IP？")
 	// Try applying rules again if we have IPs.
 	for _, rule := range r.rules {
 		if rule.Apply(ctx) {
@@ -142,6 +151,7 @@ func (r *Route) GetOutboundTag() string {
 }
 
 func init() {
+	fmt.Println("in app-router-router.go func init()")
 	common.Must(common.RegisterConfig((*Config)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		r := new(Router)
 		if err := core.RequireFeatures(ctx, func(d dns.Client, ohm outbound.Manager) error {

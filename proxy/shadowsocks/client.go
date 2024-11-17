@@ -5,6 +5,7 @@ package shadowsocks
 
 import (
 	"context"
+	"fmt"
 
 	core "github.com/gzjjjfree/gzv2ray-v4"
 	"github.com/gzjjjfree/gzv2ray-v4/common"
@@ -28,6 +29,7 @@ type Client struct {
 
 // NewClient create a new Shadowsocks client.
 func NewClient(ctx context.Context, config *ClientConfig) (*Client, error) {
+	fmt.Println("in proxy-shadowsocks-client.go func  NewClient")
 	serverList := protocol.NewServerList()
 	for _, rec := range config.Server {
 		s, err := protocol.NewServerSpecFromPB(rec)
@@ -50,6 +52,7 @@ func NewClient(ctx context.Context, config *ClientConfig) (*Client, error) {
 
 // Process implements OutboundHandler.Process().
 func (c *Client) Process(ctx context.Context, link *transport.Link, dialer internet.Dialer) error {
+	fmt.Println("in proxy-shadowsocks-client.go func (c *Client) Process")
 	outbound := session.OutboundFromContext(ctx)
 	if outbound == nil || !outbound.Target.IsValid() {
 		return newError("target not specified")
@@ -177,6 +180,7 @@ func (c *Client) Process(ctx context.Context, link *transport.Link, dialer inter
 }
 
 func init() {
+	fmt.Println("in proxy-shadowsocks-client.go func init()")
 	common.Must(common.RegisterConfig((*ClientConfig)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		return NewClient(ctx, config.(*ClientConfig))
 	}))

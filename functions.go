@@ -20,13 +20,8 @@ func CreateObject(v *Instance, config interface{}) (interface{}, error) {
 	//fmt.Println("in functions.go func CreateObject")
 	var ctx context.Context
 	if v != nil {
-		fmt.Println("in functions.go func CreateObject v != nil")
+		//fmt.Println("in functions.go func CreateObject v != nil")
 		ctx = toContext(v.ctx, v)
-	}
-	if v.featureResolutions == nil {
-		fmt.Println("in functions.go func CreateObject v.featureResolutions == nil")
-	} else {
-		fmt.Println("in functions.go func CreateObject v.featureResolutions != nil")
 	}
 	//fmt.Println("in functions.go func CreateObject return")
 	return common.CreateObject(ctx, config)
@@ -64,7 +59,7 @@ func Dial(ctx context.Context, v *Instance, dest net.Destination) (net.Conn, err
 
 	dispatcher := v.GetFeature(routing.DispatcherType())
 	if dispatcher == nil {
-		return nil, errors.New("routing.Dispatcher is not registered in V2Ray core")
+		return nil, errors.New("routing.Dispatcher is not registered in GzV2Ray core")
 	}
 
 	r, err := dispatcher.(routing.Dispatcher).Dispatch(ctx, dest)
@@ -92,7 +87,7 @@ func DialUDP(ctx context.Context, v *Instance) (net.PacketConn, error) {
 
 	dispatcher := v.GetFeature(routing.DispatcherType())
 	if dispatcher == nil {
-		return nil, errors.New("routing.Dispatcher is not registered in V2Ray core")
+		return nil, errors.New("routing.Dispatcher is not registered in GzV2Ray core")
 	}
 	return udp.DialDispatcher(ctx, dispatcher.(routing.Dispatcher))
 }

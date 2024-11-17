@@ -90,8 +90,8 @@ func (c *CertificateCommand) Execute(args []string) error {
 	var domainNames stringList
 	fs.Var(&domainNames, "domain", "Domain name for the certificate")
 
-	commonName := fs.String("name", "V2Ray Inc", "The common name of this certificate")
-	organization := fs.String("org", "V2Ray Inc", "Organization of the certificate")
+	commonName := fs.String("name", "GzV2Ray Inc", "The common name of this certificate")
+	organization := fs.String("org", "GzV2Ray Inc", "Organization of the certificate")
 
 	isCA := fs.Bool("ca", false, "Whether this certificate is a CA")
 	jsonOutput := fs.Bool("json", true, "Print certificate in JSON format")

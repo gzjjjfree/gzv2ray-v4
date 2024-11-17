@@ -6,6 +6,7 @@ package shadowsocks
 import (
 	"context"
 	"time"
+	"fmt"
 
 	core "github.com/gzjjjfree/gzv2ray-v4"
 	"github.com/gzjjjfree/gzv2ray-v4/common"
@@ -31,6 +32,7 @@ type Server struct {
 
 // NewServer create a new Shadowsocks server.
 func NewServer(ctx context.Context, config *ServerConfig) (*Server, error) {
+	fmt.Println("in proxy-shadowsocks-server.go func NewServer")
 	if config.GetUser() == nil {
 		return nil, newError("user is not specified")
 	}
@@ -51,6 +53,7 @@ func NewServer(ctx context.Context, config *ServerConfig) (*Server, error) {
 }
 
 func (s *Server) Network() []net.Network {
+	fmt.Println("in proxy-shadowsocks-server.go func (s *Server) Network()")
 	list := s.config.Network
 	if len(list) == 0 {
 		list = append(list, net.Network_TCP)
@@ -62,6 +65,7 @@ func (s *Server) Network() []net.Network {
 }
 
 func (s *Server) Process(ctx context.Context, network net.Network, conn internet.Connection, dispatcher routing.Dispatcher) error {
+	fmt.Println("in proxy-shadowsocks-server.go func (s *Server) Process")
 	switch network {
 	case net.Network_TCP:
 		return s.handleConnection(ctx, conn, dispatcher)
@@ -73,6 +77,7 @@ func (s *Server) Process(ctx context.Context, network net.Network, conn internet
 }
 
 func (s *Server) handlerUDPPayload(ctx context.Context, conn internet.Connection, dispatcher routing.Dispatcher) error {
+	fmt.Println("in proxy-shadowsocks-server.go func  (s *Server) handlerUDPPayload")
 	udpServer := udp.NewDispatcher(dispatcher, func(ctx context.Context, packet *udp_proto.Packet) {
 		request := protocol.RequestHeaderFromContext(ctx)
 		if request == nil {
@@ -142,6 +147,7 @@ func (s *Server) handlerUDPPayload(ctx context.Context, conn internet.Connection
 }
 
 func (s *Server) handleConnection(ctx context.Context, conn internet.Connection, dispatcher routing.Dispatcher) error {
+	fmt.Println("in proxy-shadowsocks-server.go func  (s *Server) handleConnection")
 	sessionPolicy := s.policyManager.ForLevel(s.user.Level)
 	conn.SetReadDeadline(time.Now().Add(sessionPolicy.Timeouts.Handshake))
 
@@ -234,6 +240,7 @@ func (s *Server) handleConnection(ctx context.Context, conn internet.Connection,
 }
 
 func init() {
+	fmt.Println("in proxy-shadowsocks-server.go func init")
 	common.Must(common.RegisterConfig((*ServerConfig)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		return NewServer(ctx, config.(*ServerConfig))
 	}))

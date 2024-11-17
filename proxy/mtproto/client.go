@@ -2,6 +2,7 @@ package mtproto
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common"
 	"github.com/gzjjjfree/gzv2ray-v4/common/buf"
@@ -21,6 +22,7 @@ func NewClient(ctx context.Context, config *ClientConfig) (*Client, error) {
 }
 
 func (c *Client) Process(ctx context.Context, link *transport.Link, dialer internet.Dialer) error {
+	fmt.Println("in proxy-mtproto-client.go func (c *Client) Process")
 	outbound := session.OutboundFromContext(ctx)
 	if outbound == nil || !outbound.Target.IsValid() {
 		return newError("unknown destination.")
@@ -71,6 +73,7 @@ func (c *Client) Process(ctx context.Context, link *transport.Link, dialer inter
 }
 
 func init() {
+	fmt.Println("in proxy-mtproto-client.go func intit()")
 	common.Must(common.RegisterConfig((*ClientConfig)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		return NewClient(ctx, config.(*ClientConfig))
 	}))

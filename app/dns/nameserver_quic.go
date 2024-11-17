@@ -9,6 +9,7 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+	"fmt"
 
 	//"github.com/lucas-clemente/quic-go"
 	"github.com/quic-go/quic-go"
@@ -48,6 +49,7 @@ type QUICNameServer struct {
 
 // NewQUICNameServer creates DNS-over-QUIC client object for local resolving
 func NewQUICNameServer(url *url.URL) (*QUICNameServer, error) {
+	fmt.Println("in app-dns-nameserver_quic.go func NewQUICNameServer")
 	newError("DNS: created Local DNS-over-QUIC client for ", url.String()).AtInfo().WriteToLog()
 
 	var err error
@@ -81,6 +83,7 @@ func (s *QUICNameServer) Name() string {
 
 // Cleanup clears expired items from cache
 func (s *QUICNameServer) Cleanup() error {
+	fmt.Println("in app-dns-nameserver_quic.go func (s *QUICNameServer) Cleanup()")
 	now := time.Now()
 	s.Lock()
 	defer s.Unlock()
@@ -113,6 +116,7 @@ func (s *QUICNameServer) Cleanup() error {
 }
 
 func (s *QUICNameServer) updateIP(req *dnsRequest, ipRec *IPRecord) {
+	fmt.Println("in app-dns-nameserver_quic.go func (s *QUICNameServer) updateIP")
 	elapsed := time.Since(req.start)
 
 	s.Lock()
@@ -158,6 +162,7 @@ func (s *QUICNameServer) newReqID() uint16 {
 }
 
 func (s *QUICNameServer) sendQuery(ctx context.Context, domain string, clientIP net.IP, option dns_feature.IPOption) {
+	fmt.Println("in app-dns-nameserver_quic.go func (s *QUICNameServer) sendQuery")
 	newError(s.name, " querying: ", domain).AtInfo()
 
 	reqs := buildReqMsgs(domain, option, s.newReqID, genEDNS0Options(clientIP))
@@ -228,6 +233,7 @@ func (s *QUICNameServer) sendQuery(ctx context.Context, domain string, clientIP 
 }
 
 func (s *QUICNameServer) findIPsForDomain(domain string, option dns_feature.IPOption) ([]net.IP, error) {
+	fmt.Println("in app-dns-nameserver_quic.go func (s *QUICNameServer) findIPsForDomain")
 	s.RLock()
 	record, found := s.ips[domain]
 	s.RUnlock()
@@ -271,6 +277,7 @@ func (s *QUICNameServer) findIPsForDomain(domain string, option dns_feature.IPOp
 
 // QueryIP is called from dns.Server->queryIPTimeout
 func (s *QUICNameServer) QueryIP(ctx context.Context, domain string, clientIP net.IP, option dns_feature.IPOption, disableCache bool) ([]net.IP, error) {
+	fmt.Println("in app-dns-nameserver_quic.go func (s *QUICNameServer) QueryIP")
 	fqdn := Fqdn(domain)
 
 	if disableCache {
@@ -335,6 +342,7 @@ func isActive(s quic.Connection) bool {
 }
 
 func (s *QUICNameServer) getSession() (quic.Connection, error) {
+	fmt.Println("in app-dns-nameserver_quic.go func (s *QUICNameServer) getSession()")
 	var session quic.Connection
 	s.RLock()
 	session = s.connection
@@ -369,6 +377,7 @@ func (s *QUICNameServer) getSession() (quic.Connection, error) {
 }
 
 func (s *QUICNameServer) openSession() (quic.Connection, error) {
+	fmt.Println("in app-dns-nameserver_quic.go func (s *QUICNameServer) openSession()")
 	tlsConfig := tls.Config{}
 	quicConfig := &quic.Config{
 		HandshakeIdleTimeout: handshakeIdleTimeout,

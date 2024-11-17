@@ -7,6 +7,7 @@ package command
 import (
 	"context"
 	"time"
+	"fmt"
 
 	"google.golang.org/grpc"
 
@@ -24,6 +25,7 @@ type routingServer struct {
 
 // NewRoutingServer creates a statistics service with statistics manager.
 func NewRoutingServer(router routing.Router, routingStats stats.Channel) RoutingServiceServer {
+	fmt.Println("in app-router-command-command.go func NewRoutingServer")
 	return &routingServer{
 		router:       router,
 		routingStats: routingStats,
@@ -31,6 +33,7 @@ func NewRoutingServer(router routing.Router, routingStats stats.Channel) Routing
 }
 
 func (s *routingServer) TestRoute(ctx context.Context, request *TestRouteRequest) (*RoutingContext, error) {
+	fmt.Println("in app-router-command-command.go func (s *routingServer) TestRoute")
 	if request.RoutingContext == nil {
 		return nil, newError("Invalid routing request.")
 	}
@@ -46,6 +49,7 @@ func (s *routingServer) TestRoute(ctx context.Context, request *TestRouteRequest
 }
 
 func (s *routingServer) SubscribeRoutingStats(request *SubscribeRoutingStatsRequest, stream RoutingService_SubscribeRoutingStatsServer) error {
+	fmt.Println("in app-router-command-command.go func (s *routingServer) SubscribeRoutingStats")
 	if s.routingStats == nil {
 		return newError("Routing statistics not enabled.")
 	}
@@ -88,6 +92,7 @@ func (s *service) Register(server *grpc.Server) {
 }
 
 func init() {
+	fmt.Println("in app-router-command-command.go func init()")
 	common.Must(common.RegisterConfig((*Config)(nil), func(ctx context.Context, cfg interface{}) (interface{}, error) {
 		s := core.MustFromContext(ctx)
 		return &service{v: s}, nil

@@ -99,7 +99,7 @@ Download %s v%s or later from https://github.com/protocolbuffers/protobuf/releas
 func getProjectProtocVersion(url string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		return "", fmt.Errorf("can not get the version of protobuf used in V2Ray project")
+		return "", fmt.Errorf("can not get the version of protobuf used in GzV2Ray project")
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)

@@ -8,6 +8,8 @@ import (
 	"errors"
 	"fmt"
 
+	"example.com/gztest"
+
 	"github.com/gzjjjfree/gzv2ray-v4/app/proxyman"
 	"github.com/gzjjjfree/gzv2ray-v4/common"
 	"github.com/gzjjjfree/gzv2ray-v4/common/buf"
@@ -57,12 +59,15 @@ func getTProxyType(s *internet.MemoryStreamConfig) internet.SocketConfig_TProxyM
 }
 
 func (w *tcpWorker) callback(conn internet.Connection) {
+	fmt.Println("in  app-proxyman-inbound-worker.go func (w *tcpWorker) callback")
 	ctx, cancel := context.WithCancel(w.ctx)
 	sid := session.NewID()
 	ctx = session.ContextWithID(ctx, sid)
 
 	if w.recvOrigDest {
 		var dest net.Destination
+		fmt.Println("getTProxyType(w.stream) is: ")
+		gztest.GetMessageReflectType(getTProxyType(w.stream))
 		switch getTProxyType(w.stream) {
 		case internet.SocketConfig_Redirect:
 			d, err := tcp.GetOriginalDestination(conn)
@@ -87,12 +92,14 @@ func (w *tcpWorker) callback(conn internet.Connection) {
 	})
 	content := new(session.Content)
 	if w.sniffingConfig != nil {
+		fmt.Println("in  app-proxyman-inbound-worker.go func (w *tcpWorker) callback w.sniffingConfig != nil")
 		content.SniffingRequest.Enabled = w.sniffingConfig.Enabled
 		content.SniffingRequest.OverrideDestinationForProtocol = w.sniffingConfig.DestinationOverride
 		content.SniffingRequest.MetadataOnly = w.sniffingConfig.MetadataOnly
 	}
 	ctx = session.ContextWithContent(ctx, content)
 	if w.uplinkCounter != nil || w.downlinkCounter != nil {
+		fmt.Println("in  app-proxyman-inbound-worker.go func (w *tcpWorker) callback w.uplinkCounter != nil || w.downlinkCounter != nil")
 		conn = &internet.StatCouterConnection{
 			Connection:   conn,
 			ReadCounter:  w.uplinkCounter,
@@ -116,6 +123,8 @@ func (w *tcpWorker) Start() error {
 	fmt.Println("in  app-proxyman-inbound-worker.go func (w *tcpWorker) Start()")
 	ctx := context.Background()
 	hub, err := internet.ListenTCP(ctx, w.address, w.port, w.stream, func(conn internet.Connection) {
+		fmt.Println("in  app-proxyman-inbound-worker.go func (w *tcpWorker) Start() 开启一个协程 *tcpWorker-callback 等待数据")
+		// 开启一个协程等待数据
 		go w.callback(conn)
 	})
 	if err != nil {
@@ -165,6 +174,7 @@ func (c *udpConn) updateActivity() {
 
 // ReadMultiBuffer implements buf.Reader
 func (c *udpConn) ReadMultiBuffer() (buf.MultiBuffer, error) {
+	fmt.Println("in  app-proxyman-inbound-worker.go func (c *udpConn) ReadMultiBuffer()")
 	mb, err := c.reader.ReadMultiBuffer()
 	if err != nil {
 		return nil, err
@@ -247,6 +257,7 @@ type udpWorker struct {
 }
 
 func (w *udpWorker) getConnection(id connID) (*udpConn, bool) {
+	fmt.Println("in  app-proxyman-inbound-worker.go func (w *udpWorker) getConnection")
 	w.Lock()
 	defer w.Unlock()
 
@@ -280,6 +291,7 @@ func (w *udpWorker) getConnection(id connID) (*udpConn, bool) {
 }
 
 func (w *udpWorker) callback(b *buf.Buffer, source net.Destination, originalDest net.Destination) {
+	fmt.Println("in  app-proxyman-inbound-worker.go func (w *udpWorker) callback")
 	id := connID{
 		src: source,
 	}
@@ -332,6 +344,7 @@ func (w *udpWorker) removeConn(id connID) {
 }
 
 func (w *udpWorker) handlePackets() {
+	fmt.Println("in  app-proxyman-inbound-worker.go func (w *udpWorker) handlePackets()")
 	receive := w.hub.Receive()
 	for payload := range receive {
 		w.callback(payload.Payload, payload.Source, payload.Target)
@@ -339,6 +352,7 @@ func (w *udpWorker) handlePackets() {
 }
 
 func (w *udpWorker) clean() error {
+	fmt.Println("in  app-proxyman-inbound-worker.go func (w *udpWorker) clean")
 	nowSec := time.Now().Unix()
 	w.Lock()
 	defer w.Unlock()
@@ -433,6 +447,7 @@ type dsWorker struct {
 }
 
 func (w *dsWorker) callback(conn internet.Connection) {
+	fmt.Println("in  app-proxyman-inbound-worker.go func   (w *dsWorker) callback")
 	ctx, cancel := context.WithCancel(w.ctx)
 	sid := session.NewID()
 	ctx = session.ContextWithID(ctx, sid)

@@ -22,6 +22,7 @@ import (
 )
 
 func getStatCounter(v *core.Instance, tag string) (stats.Counter, stats.Counter) {
+	fmt.Println("in app-proxymann-outbound-handler.go func getStatCounter")
 	var uplinkCounter stats.Counter
 	var downlinkCounter stats.Counter
 
@@ -60,6 +61,7 @@ type Handler struct {
 
 // NewHandler create a new Handler based on the given configuration.
 func NewHandler(ctx context.Context, config *core.OutboundHandlerConfig) (outbound.Handler, error) {
+	fmt.Println("in app-proxymann-outbound-handler.go func NewHandler")
 	v := core.MustFromContext(ctx)
 	uplinkCounter, downlinkCounter := getStatCounter(v, config.Tag)
 	h := &Handler{
@@ -134,6 +136,7 @@ func (h *Handler) Tag() string {
 
 // Dispatch implements proxy.Outbound.Dispatch.
 func (h *Handler) Dispatch(ctx context.Context, link *transport.Link) {
+	fmt.Println("in app-proxymann-outbound-handler.go func (h *Handler) Dispatch")
 	if h.mux != nil && (h.mux.Enabled || session.MuxPreferedFromContext(ctx)) {
 		if err := h.mux.Dispatch(ctx, link); err != nil {
 			fmt.Println("failed to process mux outbound traffic")
@@ -161,6 +164,7 @@ func (h *Handler) Address() net.Address {
 
 // Dial implements internet.Dialer.
 func (h *Handler) Dial(ctx context.Context, dest net.Destination) (internet.Connection, error) {
+	fmt.Println("in app-proxymann-outbound-handler.go func (h *Handler) Dial dest is: ", dest)
 	if h.senderSettings != nil {
 		if h.senderSettings.ProxySettings.HasTag() && !h.senderSettings.ProxySettings.TransportLayerProxy {
 			tag := h.senderSettings.ProxySettings.Tag
@@ -210,6 +214,7 @@ func (h *Handler) Dial(ctx context.Context, dest net.Destination) (internet.Conn
 }
 
 func (h *Handler) getStatCouterConnection(conn internet.Connection) internet.Connection {
+	fmt.Println("in app-proxymann-outbound-handler.go func (h *Handler) getStatCouterConnection")
 	if h.uplinkCounter != nil || h.downlinkCounter != nil {
 		return &internet.StatCouterConnection{
 			Connection:   conn,

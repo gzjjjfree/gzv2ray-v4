@@ -34,7 +34,7 @@ type MultiBuffer []*Buffer
 
 // MergeMulti merges content from src to dest, and returns the new address of dest and src
 func MergeMulti(dest MultiBuffer, src MultiBuffer) (MultiBuffer, MultiBuffer) {
-	fmt.Println("in common-buf-multi_buffer.go func MergeMulti")
+	//fmt.Println("in common-buf-multi_buffer.go func MergeMulti")
 	dest = append(dest, src...)
 	for idx := range src {
 		src[idx] = nil
@@ -44,7 +44,7 @@ func MergeMulti(dest MultiBuffer, src MultiBuffer) (MultiBuffer, MultiBuffer) {
 
 // MergeBytes merges the given bytes into MultiBuffer and return the new address of the merged MultiBuffer.
 func MergeBytes(dest MultiBuffer, src []byte) MultiBuffer {
-	fmt.Println("in common-buf-multi_butffer.go func MergeBytes")
+	//fmt.Println("in common-buf-multi_butffer.go func MergeBytes")
 	n := len(dest)
 	if n > 0 && !(dest)[n-1].IsFull() {
 		nBytes, _ := (dest)[n-1].Write(src)
@@ -63,7 +63,7 @@ func MergeBytes(dest MultiBuffer, src []byte) MultiBuffer {
 
 // ReleaseMulti release all content of the MultiBuffer, and returns an empty MultiBuffer.
 func ReleaseMulti(mb MultiBuffer) MultiBuffer {
-	fmt.Println("in common-buf-multi_butffer.go func ReleaseMulti")
+	//fmt.Println("in common-buf-multi_butffer.go func ReleaseMulti")
 	for i := range mb {
 		mb[i].Release()
 		mb[i] = nil
@@ -118,7 +118,7 @@ func ReadFrom(reader io.Reader) (MultiBuffer, error) {
 // SplitBytes splits the given amount of bytes from the beginning of the MultiBuffer.
 // It returns the new address of MultiBuffer leftover, and number of bytes written into the input byte slice.
 func SplitBytes(mb MultiBuffer, b []byte) (MultiBuffer, int) {
-	fmt.Println("in common-buf-multi_butffer.go func  SplitBytes")
+	//fmt.Println("in common-buf-multi_butffer.go func  SplitBytes")
 	totalBytes := 0
 	endIndex := -1
 	for i := range mb {
@@ -157,7 +157,7 @@ func SplitFirstBytes(mb MultiBuffer, p []byte) (MultiBuffer, int) {
 
 // Compact returns another MultiBuffer by merging all content of the given one together.
 func Compact(mb MultiBuffer) MultiBuffer {
-	fmt.Println("in common-buf-multi_butffer.go func Compact")
+	//fmt.Println("in common-buf-multi_butffer.go func Compact")
 	if len(mb) == 0 {
 		return mb
 	}
@@ -182,7 +182,7 @@ func Compact(mb MultiBuffer) MultiBuffer {
 
 // SplitFirst splits the first Buffer from the beginning of the MultiBuffer.
 func SplitFirst(mb MultiBuffer) (MultiBuffer, *Buffer) {
-	fmt.Println("in common-buf-multi_butffer.go func SplitFirst")
+	//fmt.Println("in common-buf-multi_butffer.go func SplitFirst")
 	if len(mb) == 0 {
 		return mb, nil
 	}
@@ -195,7 +195,7 @@ func SplitFirst(mb MultiBuffer) (MultiBuffer, *Buffer) {
 
 // SplitSize splits the beginning of the MultiBuffer into another one, for at most size bytes.
 func SplitSize(mb MultiBuffer, size int32) (MultiBuffer, MultiBuffer) {
-	fmt.Println("in common-buf-multi_butffer.go func SplitSize")
+	//fmt.Println("in common-buf-multi_butffer.go func SplitSize")
 	if len(mb) == 0 {
 		return mb, nil
 	}
@@ -230,7 +230,7 @@ func SplitSize(mb MultiBuffer, size int32) (MultiBuffer, MultiBuffer) {
 
 // WriteMultiBuffer writes all buffers from the MultiBuffer to the Writer one by one, and return error if any, with leftover MultiBuffer.
 func WriteMultiBuffer(writer io.Writer, mb MultiBuffer) (MultiBuffer, error) {
-	fmt.Println("in common-buf-multi_butffer.go func WriteMultiBuffer")
+//	fmt.Println("in common-buf-multi_butffer.go func WriteMultiBuffer")
 	for {
 		mb2, b := SplitFirst(mb)
 		mb = mb2
@@ -250,7 +250,7 @@ func WriteMultiBuffer(writer io.Writer, mb MultiBuffer) (MultiBuffer, error) {
 
 // Len returns the total number of bytes in the MultiBuffer.
 func (mb MultiBuffer) Len() int32 {
-	fmt.Println("in common-buf-multi_butffer.go func (mb MultiBuffer)")
+	//fmt.Println("in common-buf-multi_butffer.go func (mb MultiBuffer)")
 	if mb == nil {
 		return 0
 	}
@@ -264,7 +264,7 @@ func (mb MultiBuffer) Len() int32 {
 
 // IsEmpty return true if the MultiBuffer has no content.
 func (mb MultiBuffer) IsEmpty() bool {
-	fmt.Println("in common-buf-multi_butffer.go func (mb MultiBuffer)")
+	//fmt.Println("in common-buf-multi_butffer.go func (mb MultiBuffer)")
 	for _, b := range mb {
 		if !b.IsEmpty() {
 			return false

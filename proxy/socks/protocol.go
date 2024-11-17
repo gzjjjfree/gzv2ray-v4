@@ -6,6 +6,7 @@ package socks
 import (
 	"encoding/binary"
 	"io"
+	"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common"
 	"github.com/gzjjjfree/gzv2ray-v4/common/buf"
@@ -49,6 +50,7 @@ type ServerSession struct {
 }
 
 func (s *ServerSession) handshake4(cmd byte, reader io.Reader, writer io.Writer) (*protocol.RequestHeader, error) {
+	fmt.Println("in proxy-socks-protocol.go func (s *ServerSession) handshake4")
 	if s.config.AuthType == AuthType_PASSWORD {
 		writeSocks4Response(writer, socks4RequestRejected, net.AnyIP, net.Port(0))
 		return nil, newError("socks 4 is not allowed when auth is required.")
@@ -98,6 +100,7 @@ func (s *ServerSession) handshake4(cmd byte, reader io.Reader, writer io.Writer)
 }
 
 func (s *ServerSession) auth5(nMethod byte, reader io.Reader, writer io.Writer) (username string, err error) {
+	fmt.Println("in proxy-socks-protocol.go func (s *ServerSession) auth5")
 	buffer := buf.StackNew()
 	defer buffer.Release()
 
@@ -140,6 +143,7 @@ func (s *ServerSession) auth5(nMethod byte, reader io.Reader, writer io.Writer) 
 }
 
 func (s *ServerSession) handshake5(nMethod byte, reader io.Reader, writer io.Writer) (*protocol.RequestHeader, error) {
+	fmt.Println("in proxy-socks-protocol.go func (s *ServerSession) handshake5")
 	var (
 		username string
 		err      error
@@ -161,19 +165,23 @@ func (s *ServerSession) handshake5(nMethod byte, reader io.Reader, writer io.Wri
 
 	request := new(protocol.RequestHeader)
 	if username != "" {
+		fmt.Println("in proxy-socks-protocol.go func (s *ServerSession) handshake5 username != nil : ", username)
 		request.User = &protocol.MemoryUser{Email: username}
 	}
 	switch cmd {
 	case cmdTCPConnect, cmdTorResolve, cmdTorResolvePTR:
+		fmt.Println("in  handshake5 cmd = cmdTCPConnect, cmdTorResolve, cmdTorResolvePTR")
 		// We don't have a solution for Tor case now. Simply treat it as connect command.
 		request.Command = protocol.RequestCommandTCP
 	case cmdUDPAssociate:
+		fmt.Println("in  handshake5 cmd = cmdUDPAssociate")
 		if !s.config.UdpEnabled {
 			writeSocks5Response(writer, statusCmdNotSupport, net.AnyIP, net.Port(0))
 			return nil, newError("UDP is not enabled.")
 		}
 		request.Command = protocol.RequestCommandUDP
 	case cmdTCPBind:
+		fmt.Println("in  handshake5 cmd = cmdTCPBind")
 		writeSocks5Response(writer, statusCmdNotSupport, net.AnyIP, net.Port(0))
 		return nil, newError("TCP bind is not supported.")
 	default:
@@ -194,13 +202,18 @@ func (s *ServerSession) handshake5(nMethod byte, reader io.Reader, writer io.Wri
 	responsePort := s.port
 	//nolint:gocritic // Use if else chain for clarity
 	if request.Command == protocol.RequestCommandUDP {
+		
 		if s.config.Address != nil {
+			fmt.Println("in  handshake5 protocol.RequestCommandUDP s.config.Address != nil")
 			// Use configured IP as remote address in the response to UdpAssociate
+			// 在对 UdpAssociate 的响应中使用配置的 IP 作为远程地址
 			responseAddress = s.config.Address.AsAddress()
 		} else if s.clientAddress == net.LocalHostIP || s.clientAddress == net.LocalHostIPv6 {
+			fmt.Println("in  handshake5 protocol.RequestCommandUDP s.clientAddress == net.LocalHostIP || s.clientAddress == net.LocalHostIPv6")
 			// For localhost clients use loopback IP
 			responseAddress = s.clientAddress
 		} else {
+			fmt.Println("in  handshake5 protocol.RequestCommandUDP responseAddress = s.address")
 			// For non-localhost clients use inbound listening address
 			responseAddress = s.address
 		}
@@ -208,12 +221,14 @@ func (s *ServerSession) handshake5(nMethod byte, reader io.Reader, writer io.Wri
 	if err := writeSocks5Response(writer, statusSuccess, responseAddress, responsePort); err != nil {
 		return nil, err
 	}
-
+	fmt.Println("in  handshake5 request is : ", request)
 	return request, nil
 }
 
 // Handshake performs a Socks4/4a/5 handshake.
+// 握手执行 Socks4/4a/5 握手。
 func (s *ServerSession) Handshake(reader io.Reader, writer io.Writer) (*protocol.RequestHeader, error) {
+	fmt.Println("in proxy-socks-protocol.go func (s *ServerSession) Handshake")
 	buffer := buf.StackNew()
 	if _, err := buffer.ReadFullFrom(reader, 2); err != nil {
 		buffer.Release()
@@ -241,6 +256,7 @@ func (s *ServerSession) Handshake(reader io.Reader, writer io.Writer) (*protocol
 // | 1  |  1   | 1 to 255 |  1   | 1 to 255 |
 // +----+------+----------+------+----------+
 func ReadUsernamePassword(reader io.Reader) (string, string, error) {
+	fmt.Println("in proxy-socks-protocol.go func ReadUsernamePassword")
 	buffer := buf.StackNew()
 	defer buffer.Release()
 
@@ -271,6 +287,7 @@ func ReadUsernamePassword(reader io.Reader) (string, string, error) {
 
 // ReadUntilNull reads content from given reader, until a null (0x00) byte.
 func ReadUntilNull(reader io.Reader) (string, error) {
+	fmt.Println("in proxy-socks-protocol.go func ReadUntilNull")
 	b := buf.StackNew()
 	defer b.Release()
 
@@ -303,6 +320,7 @@ func writeSocks5AuthenticationResponse(writer io.Writer, version byte, auth byte
 }
 
 func writeSocks5Response(writer io.Writer, errCode byte, address net.Address, port net.Port) error {
+	fmt.Println("in proxy-socks-protocol.go func writeSocks5Response")
 	buffer := buf.New()
 	defer buffer.Release()
 
@@ -315,6 +333,7 @@ func writeSocks5Response(writer io.Writer, errCode byte, address net.Address, po
 }
 
 func writeSocks4Response(writer io.Writer, errCode byte, address net.Address, port net.Port) error {
+	fmt.Println("in proxy-socks-protocol.go func writeSocks4Response")
 	buffer := buf.StackNew()
 	defer buffer.Release()
 
@@ -327,6 +346,7 @@ func writeSocks4Response(writer io.Writer, errCode byte, address net.Address, po
 }
 
 func DecodeUDPPacket(packet *buf.Buffer) (*protocol.RequestHeader, error) {
+	fmt.Println("in proxy-socks-protocol.go func DecodeUDPPacket")
 	if packet.Len() < 5 {
 		return nil, newError("insufficient length of packet.")
 	}
@@ -352,6 +372,7 @@ func DecodeUDPPacket(packet *buf.Buffer) (*protocol.RequestHeader, error) {
 }
 
 func EncodeUDPPacket(request *protocol.RequestHeader, data []byte) (*buf.Buffer, error) {
+	fmt.Println("in proxy-socks-protocol.go func EncodeUDPPacket")
 	b := buf.New()
 	common.Must2(b.Write([]byte{0, 0, 0 /* Fragment */}))
 	if err := addrParser.WriteAddressPort(b, request.Address, request.Port); err != nil {
@@ -407,6 +428,7 @@ func (w *UDPWriter) Write(b []byte) (int, error) {
 }
 
 func ClientHandshake(request *protocol.RequestHeader, reader io.Reader, writer io.Writer) (*protocol.RequestHeader, error) {
+	fmt.Println("in proxy-socks-protocol.go func ClientHandshake")
 	authByte := byte(authNotRequired)
 	if request.User != nil {
 		authByte = byte(authPassword)

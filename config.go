@@ -29,21 +29,21 @@ import (
 // io.Reader 读取配置内容（原始方式）
 func LoadConfig(formatName string, filename string, input interface{}) (*Config, error) { // formatName 文件的类型，filename 文件名切片，input 通过 io.Reader 读取
 	ext := getExtension(filename) // ext 找 filename 后缀名
-	fmt.Println("formatName is: ", formatName)
-	fmt.Println("filename is: ", filename)
-	for key := range configLoaderByExt {
-		fmt.Printf("key=%s ", key)
-	}
+	//fmt.Println("formatName is: ", formatName)
+	//fmt.Println("filename is: ", filename)
+	//for key := range configLoaderByExt {
+	//	fmt.Printf("key=%s ", key)
+	//}
 	//fmt.Println("configLoaderByExt is: ", configLoaderByExt)
 	//fmt.Println("configLoaderByExt is: ", configLoaderByExt)
 	if len(ext) > 0 {
 		if f, found := configLoaderByExt[ext]; found { // 如果是 v2ray 的可配置格式，初始是pb
-			fmt.Println("configLoaderByExt[ext] is right")
+			//fmt.Println("configLoaderByExt[ext] is right")
 			//gztest.GetMessageReflectType(*f)
 			return f.Loader(input) // 返回配置加载函数，把文件加载到接口中
 		}
 	}
-	fmt.Println("configLoaderByName is: ", configLoaderByName)
+	//fmt.Println("configLoaderByName is: ", configLoaderByName)
 	if f, found := configLoaderByName[formatName]; found { // 通过 formatName 类型确认格式
 		return f.Loader(input)
 	}

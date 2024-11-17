@@ -24,10 +24,10 @@ func (c *APICommand) Name() string {
 
 func (c *APICommand) Description() Description {
 	return Description{
-		Short: "Call V2Ray API",
+		Short: "Call GzV2Ray API",
 		Usage: []string{
 			"v2ctl api [--server=127.0.0.1:8080] Service.Method Request",
-			"Call an API in an V2Ray process.",
+			"Call an API in an GzV2Ray process.",
 			"The following methods are currently supported:",
 			"\tLoggerService.RestartLogger",
 			"\tStatsService.GetStats",

@@ -73,6 +73,7 @@ func (info *RoundTripInfo) UpdatePeerRTO(rto uint32, current uint32) {
 }
 
 func (info *RoundTripInfo) Update(rtt uint32, current uint32) {
+	fmt.Println("in transport-internet-kcp-cnnection.go func (info *RoundTripInfo) Update")
 	if rtt > 0x7FFFFFFF {
 		return
 	}
@@ -131,6 +132,7 @@ type Updater struct {
 }
 
 func NewUpdater(interval uint32, shouldContinue func() bool, shouldTerminate func() bool, updateFunc func()) *Updater {
+	fmt.Println("in transport-internet-kcp-cnnection.go func NewUpdater")
 	u := &Updater{
 		interval:        int64(time.Duration(interval) * time.Millisecond),
 		shouldContinue:  shouldContinue,
@@ -150,6 +152,7 @@ func (u *Updater) WakeUp() {
 }
 
 func (u *Updater) run() {
+	fmt.Println("in transport-internet-kcp-cnnection.go func (u *Updater) run()")
 	defer u.notifier.Signal()
 
 	if u.shouldTerminate() {
@@ -207,6 +210,7 @@ type Connection struct {
 
 // NewConnection create a new KCP connection between local and remote.
 func NewConnection(meta ConnMetadata, writer PacketWriter, closer io.Closer, config *Config) *Connection {
+	fmt.Println("in transport-internet-kcp-cnnection.go func NewConnection")
 	newError("#", meta.Conversation, " creating connection to ", meta.RemoteAddr).WriteToLog()
 
 	conn := &Connection{
@@ -256,6 +260,7 @@ func (c *Connection) Elapsed() uint32 {
 
 // ReadMultiBuffer implements buf.Reader.
 func (c *Connection) ReadMultiBuffer() (buf.MultiBuffer, error) {
+	fmt.Println("in transport-internet-kcp-cnnection.go func (c *Connection) ReadMultiBuffer()")
 	if c == nil {
 		return nil, io.EOF
 	}
@@ -281,6 +286,7 @@ func (c *Connection) ReadMultiBuffer() (buf.MultiBuffer, error) {
 }
 
 func (c *Connection) waitForDataInput() error {
+	fmt.Println("in transport-internet-kcp-cnnection.go func  (c *Connection) waitForDataInput")
 	for i := 0; i < 16; i++ {
 		select {
 		case <-c.dataInput.Wait():
@@ -314,6 +320,7 @@ func (c *Connection) waitForDataInput() error {
 
 // Read implements the Conn Read method.
 func (c *Connection) Read(b []byte) (int, error) {
+	fmt.Println("in transport-internet-kcp-cnnection.go func  (c *Connection) Read")
 	if c == nil {
 		return 0, io.EOF
 	}
@@ -335,6 +342,7 @@ func (c *Connection) Read(b []byte) (int, error) {
 }
 
 func (c *Connection) waitForDataOutput() error {
+	fmt.Println("in transport-internet-kcp-cnnection.go func (c *Connection) waitForDataOutput")
 	for i := 0; i < 16; i++ {
 		select {
 		case <-c.dataOutput.Wait():
@@ -386,6 +394,7 @@ func (c *Connection) WriteMultiBuffer(mb buf.MultiBuffer) error {
 }
 
 func (c *Connection) writeMultiBufferInternal(reader io.Reader) error {
+	fmt.Println("in transport-internet-kcp-cnnection.go func (c *Connection) writeMultiBufferInternal")
 	updatePending := false
 	defer func() {
 		if updatePending {
@@ -429,6 +438,7 @@ func (c *Connection) writeMultiBufferInternal(reader io.Reader) error {
 }
 
 func (c *Connection) SetState(state State) {
+	fmt.Println("in transport-internet-kcp-cnnection.go func (c *Connection) SetState")
 	current := c.Elapsed()
 	atomic.StoreInt32((*int32)(&c.state), int32(state))
 	atomic.StoreUint32(&c.stateBeginTime, current)
@@ -530,6 +540,7 @@ func (c *Connection) updateTask() {
 }
 
 func (c *Connection) Terminate() {
+	fmt.Println("in transport-internet-kcp-cnnection.go func (c *Connection) Terminate()")
 	if c == nil {
 		return
 	}
@@ -561,6 +572,7 @@ func (c *Connection) OnPeerClosed() {
 
 // Input when you received a low level packet (eg. UDP packet), call it
 func (c *Connection) Input(segments []Segment) {
+	fmt.Println("in transport-internet-kcp-cnnection.go func (c *Connection) Input")
 	current := c.Elapsed()
 	atomic.StoreUint32(&c.lastIncomingTime, current)
 
@@ -608,6 +620,7 @@ func (c *Connection) Input(segments []Segment) {
 }
 
 func (c *Connection) flush() {
+	fmt.Println("in transport-internet-kcp-cnnection.go func (c *Connection) flush")
 	current := c.Elapsed()
 
 	if c.State() == StateTerminated {
@@ -651,6 +664,7 @@ func (c *Connection) State() State {
 }
 
 func (c *Connection) Ping(current uint32, cmd Command) {
+	fmt.Println("in transport-internet-kcp-cnnection.go func  (c *Connection) Ping")
 	seg := NewCmdOnlySegment()
 	seg.Conv = c.meta.Conversation
 	seg.Cmd = cmd

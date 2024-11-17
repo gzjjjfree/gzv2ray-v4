@@ -23,6 +23,7 @@ import (
 )
 
 func init() {
+	fmt.Println("in proxy-dns-dns.go func init()")
 	common.Must(common.RegisterConfig((*Config)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		h := new(Handler)
 		if err := core.RequireFeatures(ctx, func(dnsClient dns.Client) error {
@@ -47,6 +48,7 @@ type Handler struct {
 }
 
 func (h *Handler) Init(config *Config, dnsClient dns.Client) error {
+	fmt.Println("in proxy-dns-dns.go func(h *Handler) Init")
 	h.client = dnsClient
 
 	if ipv4lookup, ok := dnsClient.(dns.IPv4Lookup); ok {
@@ -76,6 +78,7 @@ func (h *Handler) isOwnLink(ctx context.Context) bool {
 }
 
 func parseIPQuery(b []byte) (r bool, domain string, id uint16, qType dnsmessage.Type) {
+	fmt.Println("in proxy-dns-dns.go func parseIPQuery")
 	var parser dnsmessage.Parser
 	header, err := parser.Start(b)
 	if err != nil {
@@ -101,6 +104,7 @@ func parseIPQuery(b []byte) (r bool, domain string, id uint16, qType dnsmessage.
 
 // Process implements proxy.Outbound.
 func (h *Handler) Process(ctx context.Context, link *transport.Link, d internet.Dialer) error {
+	fmt.Println("in proxy-dns-dns.go func (h *Handler) Process")
 	outbound := session.OutboundFromContext(ctx)
 	if outbound == nil || !outbound.Target.IsValid() {
 		return newError("invalid outbound")
@@ -212,6 +216,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, d internet.
 }
 
 func (h *Handler) handleIPQuery(id uint16, qType dnsmessage.Type, domain string, writer dns_proto.MessageWriter) {
+	fmt.Println("in proxy-dns-dns.go func (h *Handler) handleIPQuery")
 	var ips []net.IP
 	var err error
 
@@ -299,6 +304,7 @@ func (c *outboundConn) dial() error {
 }
 
 func (c *outboundConn) Write(b []byte) (int, error) {
+	fmt.Println("in proxy-dns-dns.go func (c *outboundConn) Write")
 	c.access.Lock()
 
 	if c.conn == nil {
@@ -315,6 +321,7 @@ func (c *outboundConn) Write(b []byte) (int, error) {
 }
 
 func (c *outboundConn) Read(b []byte) (int, error) {
+	fmt.Println("in proxy-dns-dns.go func  (c *outboundConn) Read")
 	var conn net.Conn
 	c.access.Lock()
 	conn = c.conn

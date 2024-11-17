@@ -89,7 +89,7 @@ func ListenTCP(ctx context.Context, address net.Address, port net.Port, streamSe
 		}
 		l.authConfig = auth
 	}
-
+// 开启一个协程，监听接收的数据
 	go l.keepAccepting()
 	return l, nil
 }
@@ -97,8 +97,11 @@ func ListenTCP(ctx context.Context, address net.Address, port net.Port, streamSe
 func (v *Listener) keepAccepting() {
 	fmt.Println("in transport-internet-tcp-hub.go func (v *Listener) keepAccepting()")
 	for {
-		conn, err := v.listener.Accept()
+		fmt.Println("等待转入下一个 TCP 连接的信号")
+		// Accept 等待并返回下一个连接给监听器
+		conn, err := v.listener.Accept()		
 		if err != nil {
+			fmt.Println("测试是否在等待信号.......")
 			errStr := err.Error()
 			if strings.Contains(errStr, "closed") {
 				break
@@ -109,16 +112,19 @@ func (v *Listener) keepAccepting() {
 			}
 			continue
 		}
-
+// Config 结构用于配置 TLS 客户端或服务器。
 		if v.tlsConfig != nil {
+			fmt.Println("in transport-internet-tcp-hub.go func (v *Listener) keepAccepting() v.tlsConfig != nil ")
 			conn = tls.Server(conn, v.tlsConfig)
 		}
 		if v.authConfig != nil {
+			fmt.Println("in transport-internet-tcp-hub.go func (v *Listener) keepAccepting() v.authConfig != nil ")
 			conn = v.authConfig.Server(conn)
 		}
-
+		fmt.Println("转入下一个 TCP 连接")
 		v.addConn(internet.Connection(conn))
 	}
+	fmt.Println("in transport-internet-tcp-hub.go func (v *Listener) keepAccepting()  END")
 }
 
 // Addr implements internet.Listener.Addr.
@@ -136,5 +142,6 @@ func (v *Listener) Close() error {
 }
 
 func init() {
+	fmt.Println("in transport-internet-tcp-hub.go func init()")
 	common.Must(internet.RegisterTransportListener(protocolName, ListenTCP))
 }

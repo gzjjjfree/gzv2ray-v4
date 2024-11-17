@@ -8,6 +8,7 @@ package outbound
 import (
 	"context"
 	"time"
+	"fmt"
 
 	core "github.com/gzjjjfree/gzv2ray-v4"
 	"github.com/gzjjjfree/gzv2ray-v4/common"
@@ -35,6 +36,7 @@ type Handler struct {
 
 // New creates a new VMess outbound handler.
 func New(ctx context.Context, config *Config) (*Handler, error) {
+	fmt.Println("in proxy-vmess-outbound-outbound.go func New")
 	serverList := protocol.NewServerList()
 	for _, rec := range config.Receiver {
 		s, err := protocol.NewServerSpecFromPB(rec)
@@ -56,13 +58,16 @@ func New(ctx context.Context, config *Config) (*Handler, error) {
 
 // Process implements proxy.Outbound.Process().
 func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer internet.Dialer) error {
+	fmt.Println("in proxy-vmess-outbound-outbound.go func (h *Handler) Process")
 	var rec *protocol.ServerSpec
 	var conn internet.Connection
 
 	err := retry.ExponentialBackoff(5, 200).On(func() error {
+		//fmt.Println("in proxy-vmess-outbound-outbound.go func (h *Handler) Process retry.ExponentialBackoff")
 		rec = h.serverPicker.PickServer()
 		rawConn, err := dialer.Dial(ctx, rec.Destination())
 		if err != nil {
+			fmt.Println("in proxy-vmess-outbound-outbound.go func (h *Handler) Process  dialer.Dial err")
 			return err
 		}
 		conn = rawConn
@@ -75,11 +80,13 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	defer conn.Close()
 
 	outbound := session.OutboundFromContext(ctx)
+	fmt.Println("in proxy-vmess-outbound-outbound.go func (h *Handler) Process session.OutboundFromContext")
 	if outbound == nil || !outbound.Target.IsValid() {
 		return newError("target not specified").AtError()
 	}
 
 	target := outbound.Target
+	fmt.Println("in proxy-vmess-outbound-outbound.go func (h *Handler) Process target is: ", target)
 	newError("tunneling request to ", target, " via ", rec.Destination()).WriteToLog(session.ExportIDToError(ctx))
 
 	command := protocol.RequestCommandTCP
@@ -194,18 +201,19 @@ func shouldEnablePadding(s protocol.SecurityType) bool {
 }
 
 func init() {
+	fmt.Println("in proxy-vmess-outbound-outbound.go func init()")
 	common.Must(common.RegisterConfig((*Config)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		return New(ctx, config.(*Config))
 	}))
 
 	const defaultFlagValue = "NOT_DEFINED_AT_ALL"
 
-	paddingValue := platform.NewEnvFlag("v2ray.vmess.padding").GetValue(func() string { return defaultFlagValue })
+	paddingValue := platform.NewEnvFlag("gzv2ray.vmess.padding").GetValue(func() string { return defaultFlagValue })
 	if paddingValue != defaultFlagValue {
 		enablePadding = true
 	}
 
-	isAeadDisabled := platform.NewEnvFlag("v2ray.vmess.aead.disabled").GetValue(func() string { return defaultFlagValue })
+	isAeadDisabled := platform.NewEnvFlag("gzv2ray.vmess.aead.disabled").GetValue(func() string { return defaultFlagValue })
 	if isAeadDisabled == "true" {
 		aeadDisabled = true
 	}

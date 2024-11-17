@@ -2,7 +2,7 @@ package external
 
 import (
 	"bytes"
-	"fmt"
+	//"fmt"
 	"io"
 	//"io/ioutil"
 	"net/http"
@@ -34,7 +34,7 @@ func ConfigLoader(arg string) (out io.Reader, err error) {
 	if err != nil {
 		return
 	}
-	fmt.Println("Print in main-confloader-extemal.go func Configloader data: ")
+	//fmt.Println("Print in main-confloader-extemal.go func Configloader data: ")
 	//这是读入的config内容
 	//fmt.Println(string(data))
 	//gztest.GetMessageReflectType(data)

@@ -20,7 +20,7 @@ func (c *VerifyCommand) Description() Description {
 		Short: "Verify if a binary is officially signed.",
 		Usage: []string{
 			"v2ctl verify --sig=<sig-file> file...",
-			"Verify the file officially signed by V2Ray.",
+			"Verify the file officially signed by GzV2Ray.",
 		},
 	}
 }
@@ -56,7 +56,7 @@ func (c *VerifyCommand) Execute(args []string) error {
 		return nil
 	}
 
-	return newError("file is not officially signed by V2Ray").Base(err)
+	return newError("file is not officially signed by GzV2Ray").Base(err)
 }
 
 func init() {

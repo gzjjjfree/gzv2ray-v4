@@ -7,6 +7,7 @@ import (
 	"context"
 	"sync"
 	"time"
+	"fmt"
 
 	"github.com/quic-go/quic-go"
 
@@ -25,6 +26,7 @@ type sessionContext struct {
 var errSessionClosed = newError("session closed")
 
 func (c *sessionContext) openStream(destAddr net.Addr) (*interConn, error) {
+	fmt.Println("in transport-internet-quic-dialer.go func (c *sessionContext) openStream")
 	if !isActive(c.session) {
 		return nil, errSessionClosed
 	}
@@ -59,6 +61,7 @@ func isActive(s quic.Connection) bool {
 }
 
 func removeInactiveSessions(sessions []*sessionContext) []*sessionContext {
+	fmt.Println("in transport-internet-quic-dialer.go func removeInactiveSessions")
 	activeSessions := make([]*sessionContext, 0, len(sessions))
 	for _, s := range sessions {
 		if isActive(s.session) {
@@ -81,6 +84,7 @@ func removeInactiveSessions(sessions []*sessionContext) []*sessionContext {
 }
 
 func openStream(sessions []*sessionContext, destAddr net.Addr) *interConn {
+	fmt.Println("in transport-internet-quic-dialer.go func openStream")
 	for _, s := range sessions {
 		if !isActive(s.session) {
 			continue
@@ -98,6 +102,7 @@ func openStream(sessions []*sessionContext, destAddr net.Addr) *interConn {
 }
 
 func (s *clientSessions) cleanSessions() error {
+	fmt.Println("in transport-internet-quic-dialer.go func (s *clientSessions) cleanSessions()")
 	s.access.Lock()
 	defer s.access.Unlock()
 
@@ -119,6 +124,7 @@ func (s *clientSessions) cleanSessions() error {
 }
 
 func (s *clientSessions) openConnection(destAddr net.Addr, config *Config, tlsConfig *tls.Config, sockopt *internet.SocketConfig) (internet.Connection, error) {
+	fmt.Println("in transport-internet-quic-dialer.go func (s *clientSessions) openConnection")
 	s.access.Lock()
 	defer s.access.Unlock()
 
@@ -184,6 +190,7 @@ func (s *clientSessions) openConnection(destAddr net.Addr, config *Config, tlsCo
 var client clientSessions
 
 func init() {
+	fmt.Println("in transport-internet-quic-dialer.go func init()")
 	client.sessions = make(map[net.Destination][]*sessionContext)
 	client.cleanup = &task.Periodic{
 		Interval: time.Minute,
@@ -193,6 +200,7 @@ func init() {
 }
 
 func Dial(ctx context.Context, dest net.Destination, streamSettings *internet.MemoryStreamConfig) (internet.Connection, error) {
+	fmt.Println("in transport-internet-quic-dialer.go func  Dial")
 	tlsConfig := tls.ConfigFromStreamSettings(streamSettings)
 	if tlsConfig == nil {
 		tlsConfig = &tls.Config{
@@ -221,5 +229,6 @@ func Dial(ctx context.Context, dest net.Destination, streamSettings *internet.Me
 }
 
 func init() {
+	fmt.Println("in transport-internet-quic-dialer.go func init()")
 	common.Must(internet.RegisterTransportDialer(protocolName, Dial))
 }

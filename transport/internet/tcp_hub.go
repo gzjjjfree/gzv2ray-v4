@@ -13,6 +13,7 @@ var (
 )
 
 func RegisterTransportListener(protocol string, listener ListenFunc) error {
+	fmt.Println("in ttansport-internet-tcp_hub.go func RegisterTransportListener")
 	if _, found := transportListenerCache[protocol]; found {
 		return errors.New(" listener already registered")
 	}
@@ -31,6 +32,7 @@ type Listener interface {
 
 // ListenUnix is the UDS version of ListenTCP
 func ListenUnix(ctx context.Context, address net.Address, settings *MemoryStreamConfig, handler ConnHandler) (Listener, error) {
+	fmt.Println("in ttansport-internet-tcp_hub.go func ListenUnix")
 	if settings == nil {
 		s, err := ToMemoryStreamConfig(nil)
 		if err != nil {
@@ -94,5 +96,6 @@ func ListenSystem(ctx context.Context, addr net.Addr, sockopt *SocketConfig) (ne
 //
 // v2ray:api:beta
 func ListenSystemPacket(ctx context.Context, addr net.Addr, sockopt *SocketConfig) (net.PacketConn, error) {
+	fmt.Println("in ttansport-internet-tcp_hub.go func ListenSystemPacket")
 	return effectiveListener.ListenPacket(ctx, addr, sockopt)
 }

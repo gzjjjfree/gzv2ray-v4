@@ -5,6 +5,7 @@ package kcp
 
 import (
 	"sync"
+	"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common/buf"
 )
@@ -70,6 +71,7 @@ func (l *AckList) Add(number uint32, timestamp uint32) {
 }
 
 func (l *AckList) Clear(una uint32) {
+	fmt.Println("in transport-internet-kcp-receiving.go func (l *AckList) Clear")
 	count := 0
 	for i := 0; i < len(l.numbers); i++ {
 		if l.numbers[i] < una {
@@ -91,6 +93,7 @@ func (l *AckList) Clear(una uint32) {
 }
 
 func (l *AckList) Flush(current uint32, rto uint32) {
+	fmt.Println("in transport-internet-kcp-receiving.go func (l *AckList) Flush")
 	l.flushCandidates = l.flushCandidates[:0]
 
 	seg := NewAckSegment()
@@ -166,6 +169,7 @@ func (w *ReceivingWorker) ProcessSendingNext(number uint32) {
 }
 
 func (w *ReceivingWorker) ProcessSegment(seg *DataSegment) {
+	fmt.Println("in transport-internet-kcp-receiving.go func  (w *ReceivingWorker) ProcessSegment")
 	w.Lock()
 	defer w.Unlock()
 
@@ -183,6 +187,7 @@ func (w *ReceivingWorker) ProcessSegment(seg *DataSegment) {
 }
 
 func (w *ReceivingWorker) ReadMultiBuffer() buf.MultiBuffer {
+	fmt.Println("in transport-internet-kcp-receiving.go func (w *ReceivingWorker) ReadMultiBuffer()")
 	if w.leftOver != nil {
 		mb := w.leftOver
 		w.leftOver = nil
@@ -239,6 +244,7 @@ func (w *ReceivingWorker) Flush(current uint32) {
 }
 
 func (w *ReceivingWorker) Write(seg Segment) error {
+	fmt.Println("in transport-internet-kcp-receiving.go func (w *ReceivingWorker) Write")
 	ackSeg := seg.(*AckSegment)
 	ackSeg.Conv = w.conn.meta.Conversation
 	ackSeg.ReceivingNext = w.nextNumber

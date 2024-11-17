@@ -38,6 +38,7 @@ type cachedReader struct {
 }
 
 func (r *cachedReader) Cache(b *buf.Buffer) {
+	//fmt.Println("in app-dispatcher-default.go func (r *cachedReader) Cache")
 	mb, _ := r.reader.ReadMultiBufferTimeout(time.Millisecond * 100)
 	r.Lock()
 	if !mb.IsEmpty() {
@@ -51,6 +52,7 @@ func (r *cachedReader) Cache(b *buf.Buffer) {
 }
 
 func (r *cachedReader) readInternal() buf.MultiBuffer {
+	//fmt.Println("in app-dispatcher-default.go func (r *cachedReader) readInternal()")
 	r.Lock()
 	defer r.Unlock()
 
@@ -64,6 +66,7 @@ func (r *cachedReader) readInternal() buf.MultiBuffer {
 }
 
 func (r *cachedReader) ReadMultiBuffer() (buf.MultiBuffer, error) {
+	//fmt.Println("in app-dispatcher-default.go func (r *cachedReader) ReadMultiBuffer()")
 	mb := r.readInternal()
 	if mb != nil {
 		return mb, nil
@@ -73,6 +76,7 @@ func (r *cachedReader) ReadMultiBuffer() (buf.MultiBuffer, error) {
 }
 
 func (r *cachedReader) ReadMultiBufferTimeout(timeout time.Duration) (buf.MultiBuffer, error) {
+	fmt.Println("in app-dispatcher-default.go func (r *cachedReader) ReadMultiBufferTimeout")
 	mb := r.readInternal()
 	if mb != nil {
 		return mb, nil
@@ -82,6 +86,7 @@ func (r *cachedReader) ReadMultiBufferTimeout(timeout time.Duration) (buf.MultiB
 }
 
 func (r *cachedReader) Interrupt() {
+	fmt.Println("in app-dispatcher-default.go func (r *cachedReader) Interrupt()")
 	r.Lock()
 	if r.cache != nil {
 		r.cache = buf.ReleaseMulti(r.cache)
@@ -135,6 +140,7 @@ func (*DefaultDispatcher) Start() error {
 func (*DefaultDispatcher) Close() error { return nil }
 
 func (d *DefaultDispatcher) getLink(ctx context.Context) (*transport.Link, *transport.Link) {
+	fmt.Println("in app-dispatcher-default.go func (d *DefaultDispatcher) getLink")
 	opt := pipe.OptionsFromContext(ctx)
 	uplinkReader, uplinkWriter := pipe.New(opt...)
 	downlinkReader, downlinkWriter := pipe.New(opt...)
@@ -181,6 +187,7 @@ func (d *DefaultDispatcher) getLink(ctx context.Context) (*transport.Link, *tran
 }
 
 func shouldOverride(result SniffResult, domainOverride []string) bool {
+	fmt.Println("in app-dispatcher-default.go func shouldOverride")
 	protocolString := result.Protocol()
 	if resComp, ok := result.(SnifferResultComposite); ok {
 		protocolString = resComp.ProtocolForDomainResult()
@@ -195,6 +202,7 @@ func shouldOverride(result SniffResult, domainOverride []string) bool {
 
 // Dispatch implements routing.Dispatcher.
 func (d *DefaultDispatcher) Dispatch(ctx context.Context, destination net.Destination) (*transport.Link, error) {
+	fmt.Println("in app-dispatcher-default.go func (d *DefaultDispatcher) Dispatch destination is: ", destination)
 	if !destination.IsValid() {
 		panic("Dispatcher: Invalid destination.")
 	}
@@ -212,9 +220,12 @@ func (d *DefaultDispatcher) Dispatch(ctx context.Context, destination net.Destin
 	sniffingRequest := content.SniffingRequest
 	switch {
 	case !sniffingRequest.Enabled:
+		fmt.Println("in app-dispatcher-default.go func (d *DefaultDispatcher) Dispatch !sniffingRequest.Enabled:")
 		go d.routedDispatch(ctx, outbound, destination)
 	case destination.Network != net.Network_TCP:
+		fmt.Println("in app-dispatcher-default.go func (d *DefaultDispatcher) Dispatch destination.Network != net.Network_TCP")
 		// Only metadata sniff will be used for non tcp connection
+		// 非 TCP 连接仅使用元数据嗅探
 		result, err := sniffer(ctx, nil, true)
 		if err == nil {
 			content.Protocol = result.Protocol()
@@ -227,6 +238,7 @@ func (d *DefaultDispatcher) Dispatch(ctx context.Context, destination net.Destin
 		}
 		go d.routedDispatch(ctx, outbound, destination)
 	default:
+		fmt.Println("in app-dispatcher-default.go func (d *DefaultDispatcher) Dispatch default:")
 		go func() {
 			cReader := &cachedReader{
 				reader: outbound.Reader.(*pipe.Reader),
@@ -241,6 +253,7 @@ func (d *DefaultDispatcher) Dispatch(ctx context.Context, destination net.Destin
 				newError("sniffed domain: ", domain)
 				destination.Address = net.ParseAddress(domain)
 				ob.Target = destination
+				fmt.Println("in app-dispatcher-default.go func (d *DefaultDispatcher) Dispatch ob.Target: ", ob.Target)
 			}
 			d.routedDispatch(ctx, outbound, destination)
 		}()
@@ -249,17 +262,18 @@ func (d *DefaultDispatcher) Dispatch(ctx context.Context, destination net.Destin
 }
 
 func sniffer(ctx context.Context, cReader *cachedReader, metadataOnly bool) (SniffResult, error) {
+	//fmt.Println("in app-dispatcher-default.go func sniffer")
 	payload := buf.New()
 	defer payload.Release()
 
 	sniffer := NewSniffer(ctx)
 
 	metaresult, metadataErr := sniffer.SniffMetadata(ctx)
-
+	fmt.Println("in app-dispatcher-default.go func sniffer metaresult is: ", metaresult)
 	if metadataOnly {
 		return metaresult, metadataErr
 	}
-
+	fmt.Println("in app-dispatcher-default.go func sniffer 不会执行")
 	contentResult, contentErr := func() (SniffResult, error) {
 		totalAttempt := 0
 		for {
@@ -295,9 +309,11 @@ func sniffer(ctx context.Context, cReader *cachedReader, metadataOnly bool) (Sni
 }
 
 func (d *DefaultDispatcher) routedDispatch(ctx context.Context, link *transport.Link, destination net.Destination) {
+	fmt.Println("in app-dispatcher-default.go func (d *DefaultDispatcher) routedDispatch")
 	var handler outbound.Handler
 
 	if forcedOutboundTag := session.GetForcedOutboundTagFromContext(ctx); forcedOutboundTag != "" {
+		fmt.Println("in app-dispatcher-default.go func (d *DefaultDispatcher) routedDispatch forcedOutboundTag is: ", forcedOutboundTag)
 		ctx = session.SetForcedOutboundTagToContext(ctx, "")
 		if h := d.ohm.GetHandler(forcedOutboundTag); h != nil {
 			newError("taking platform initialized detour [", forcedOutboundTag, "] for [", destination, "]")
@@ -311,6 +327,7 @@ func (d *DefaultDispatcher) routedDispatch(ctx context.Context, link *transport.
 	} else if d.router != nil {
 		if route, err := d.router.PickRoute(routing_session.AsRoutingContext(ctx)); err == nil {
 			tag := route.GetOutboundTag()
+			fmt.Println("in app-dispatcher-default.go func (d *DefaultDispatcher) routedDispatch Tag is: ", tag)
 			if h := d.ohm.GetHandler(tag); h != nil {
 				newError("taking detour [", tag, "] for [", destination, "]")
 				handler = h

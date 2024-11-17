@@ -22,7 +22,7 @@ import (
 )
 
 
-var muxCoolAddress = net.DomainAddress("gv1.mux.cool")
+var muxCoolAddress = net.DomainAddress("v1.mux.cool")
 
 type ClientManager struct {
 	Enabled bool // wheather mux is enabled from user config

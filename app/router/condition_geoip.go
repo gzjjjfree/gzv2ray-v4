@@ -5,6 +5,7 @@ package router
 import (
 	"encoding/binary"
 	"sort"
+	"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common/net"
 )
@@ -38,6 +39,7 @@ func normalize6(ip ipv6, prefix uint8) ipv6 {
 }
 
 func (m *GeoIPMatcher) Init(cidrs []*CIDR) error {
+	fmt.Println("in app-router-bcondition_geoip.go func (m *GeoIPMatcher) Init")
 	ip4Count := 0
 	ip6Count := 0
 
@@ -88,6 +90,7 @@ func (m *GeoIPMatcher) SetReverseMatch(isReverseMatch bool) {
 }
 
 func (m *GeoIPMatcher) match4(ip uint32) bool {
+	fmt.Println("in app-router-bcondition_geoip.go func (m *GeoIPMatcher) match4")
 	if len(m.ip4) == 0 {
 		return false
 	}
@@ -122,6 +125,7 @@ func less6(a ipv6, b ipv6) bool {
 }
 
 func (m *GeoIPMatcher) match6(ip ipv6) bool {
+	fmt.Println("in app-router-bcondition_geoip.go func (m *GeoIPMatcher) match6")
 	if len(m.ip6) == 0 {
 		return false
 	}
@@ -152,6 +156,7 @@ func (m *GeoIPMatcher) match6(ip ipv6) bool {
 
 // Match returns true if the given ip is included by the GeoIP.
 func (m *GeoIPMatcher) Match(ip net.IP) bool {
+	fmt.Println("in app-router-condition_geoip.go func (m *GeoIPMatcher) Match")
 	switch len(ip) {
 	case 4:
 		if m.reverseMatch {
@@ -182,6 +187,7 @@ type GeoIPMatcherContainer struct {
 // Add adds a new GeoIP set into the container.
 // If the country code of GeoIP is not empty, GeoIPMatcherContainer will try to find an existing one, instead of adding a new one.
 func (c *GeoIPMatcherContainer) Add(geoip *GeoIP) (*GeoIPMatcher, error) {
+	fmt.Println("in app-router-condition_geoip.go func (c *GeoIPMatcherContainer) Add")
 	if len(geoip.CountryCode) > 0 {
 		for _, m := range c.matchers {
 			if m.countryCode == geoip.CountryCode && m.reverseMatch == geoip.ReverseMatch {

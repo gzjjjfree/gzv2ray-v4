@@ -7,6 +7,7 @@ import (
 	"context"
 	"io"
 	"time"
+	"fmt"
 
 	core "github.com/gzjjjfree/gzv2ray-v4"
 	"github.com/gzjjjfree/gzv2ray-v4/common"
@@ -33,6 +34,7 @@ type Server struct {
 
 // NewServer creates a new Server object.
 func NewServer(ctx context.Context, config *ServerConfig) (*Server, error) {
+	fmt.Println("in proxy-socks-serrverr.go func NewServer")
 	v := core.MustFromContext(ctx)
 	s := &Server{
 		config:        config,
@@ -42,6 +44,7 @@ func NewServer(ctx context.Context, config *ServerConfig) (*Server, error) {
 }
 
 func (s *Server) policy() policy.Session {
+	fmt.Println("in proxy-socks-serrverr.go func (s *Server) policy()")
 	config := s.config
 	p := s.policyManager.ForLevel(config.UserLevel)
 	if config.Timeout > 0 {
@@ -50,11 +53,13 @@ func (s *Server) policy() policy.Session {
 	if config.Timeout > 0 && config.UserLevel == 0 {
 		p.Timeouts.ConnectionIdle = time.Duration(config.Timeout) * time.Second
 	}
+	fmt.Println("P is: ", p)
 	return p
 }
 
 // Network implements proxy.Inbound.
 func (s *Server) Network() []net.Network {
+	fmt.Println("in proxy-socks-serrverr.go func (s *Server) Network()")
 	list := []net.Network{net.Network_TCP}
 	if s.config.UdpEnabled {
 		list = append(list, net.Network_UDP)
@@ -64,10 +69,12 @@ func (s *Server) Network() []net.Network {
 
 // Process implements proxy.Inbound.
 func (s *Server) Process(ctx context.Context, network net.Network, conn internet.Connection, dispatcher routing.Dispatcher) error {
+	fmt.Println("in proxy-socks-serrverr.go func (s *Server) Process")
 	if inbound := session.InboundFromContext(ctx); inbound != nil {
 		inbound.User = &protocol.MemoryUser{
 			Level: s.config.UserLevel,
 		}
+		fmt.Println("inbound.User: ", inbound.User)
 	}
 
 	switch network {
@@ -81,6 +88,7 @@ func (s *Server) Process(ctx context.Context, network net.Network, conn internet
 }
 
 func (s *Server) processTCP(ctx context.Context, conn internet.Connection, dispatcher routing.Dispatcher) error {
+	fmt.Println("in proxy-socks-serrverr.go func (s *Server) processTCP")
 	plcy := s.policy()
 	if err := conn.SetReadDeadline(time.Now().Add(plcy.Timeouts.Handshake)); err != nil {
 		newError("failed to set deadline").Base(err).WriteToLog(session.ExportIDToError(ctx))
@@ -120,9 +128,11 @@ func (s *Server) processTCP(ctx context.Context, conn internet.Connection, dispa
 	}
 
 	if request.Command == protocol.RequestCommandTCP {
+		fmt.Println("in proxy-socks-server.go func processTCP request.Command == protocol.RequestCommandTCP")
 		dest := request.Destination()
 		newError("TCP Connect request to ", dest).WriteToLog(session.ExportIDToError(ctx))
 		if inbound != nil && inbound.Source.IsValid() {
+			fmt.Println("in proxy-socks-server.go func processTCP protocol.RequestCommandTCP inbound != nil && inbound.Source.IsValid()")
 			ctx = log.ContextWithAccessMessage(ctx, &log.AccessMessage{
 				From:   inbound.Source,
 				To:     dest,
@@ -135,6 +145,7 @@ func (s *Server) processTCP(ctx context.Context, conn internet.Connection, dispa
 	}
 
 	if request.Command == protocol.RequestCommandUDP {
+		fmt.Println("in proxy-socks-server.go func processTCP request.Command == protocol.RequestCommandUDP")
 		return s.handleUDP(conn)
 	}
 
@@ -148,6 +159,7 @@ func (*Server) handleUDP(c io.Reader) error {
 }
 
 func (s *Server) transport(ctx context.Context, reader io.Reader, writer io.Writer, dest net.Destination, dispatcher routing.Dispatcher) error {
+	fmt.Println("in proxy-socks-server.go func (s *Server) transport dest is: ", dest)
 	ctx, cancel := context.WithCancel(ctx)
 	timer := signal.CancelAfterInactivity(ctx, cancel, s.policy().Timeouts.ConnectionIdle)
 
@@ -157,7 +169,7 @@ func (s *Server) transport(ctx context.Context, reader io.Reader, writer io.Writ
 	if err != nil {
 		return err
 	}
-
+	fmt.Println("in proxy-socks-serrverr.go link is: ", *link)
 	requestDone := func() error {
 		defer timer.SetTimeout(plcy.Timeouts.DownlinkOnly)
 		if err := buf.Copy(buf.NewReader(reader), link.Writer, buf.UpdateActivity(timer)); err != nil {
@@ -177,18 +189,19 @@ func (s *Server) transport(ctx context.Context, reader io.Reader, writer io.Writ
 
 		return nil
 	}
-
+	fmt.Println("in proxy-socks-serrverr.go task.OnSuccess(requestDone, task.Close(link.Writer))")
 	var requestDonePost = task.OnSuccess(requestDone, task.Close(link.Writer))
 	if err := task.Run(ctx, requestDonePost, responseDone); err != nil {
 		common.Interrupt(link.Reader)
 		common.Interrupt(link.Writer)
 		return newError("connection ends").Base(err)
 	}
-
+	fmt.Println("in proxy-socks-serrverr.go func (s *Server) transport END")
 	return nil
 }
 
 func (s *Server) handleUDPPayload(ctx context.Context, conn internet.Connection, dispatcher routing.Dispatcher) error {
+	fmt.Println("in proxy-socks-serrverr.go func (s *Server) handleUDPPayload")
 	udpServer := udp.NewDispatcher(dispatcher, func(ctx context.Context, packet *udp_proto.Packet) {
 		payload := packet.Payload
 		newError("writing back UDP response with ", payload.Len(), " bytes").AtDebug().WriteToLog(session.ExportIDToError(ctx))
@@ -250,6 +263,7 @@ func (s *Server) handleUDPPayload(ctx context.Context, conn internet.Connection,
 }
 
 func init() {
+	fmt.Println("in proxy-socks-serrverr.go func init()")
 	common.Must(common.RegisterConfig((*ServerConfig)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		return NewServer(ctx, config.(*ServerConfig))
 	}))

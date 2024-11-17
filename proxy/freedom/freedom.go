@@ -7,6 +7,7 @@ package freedom
 import (
 	"context"
 	"time"
+	"fmt"
 
 	core "github.com/gzjjjfree/gzv2ray-v4"
 	"github.com/gzjjjfree/gzv2ray-v4/common"
@@ -24,6 +25,7 @@ import (
 )
 
 func init() {
+	fmt.Println("in proxy-freedom-freedom.go func init()")
 	common.Must(common.RegisterConfig((*Config)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		h := new(Handler)
 		if err := core.RequireFeatures(ctx, func(pm policy.Manager, d dns.Client) error {
@@ -44,6 +46,7 @@ type Handler struct {
 
 // Init initializes the Handler with necessary parameters.
 func (h *Handler) Init(config *Config, pm policy.Manager, d dns.Client) error {
+	fmt.Println("in proxy-freedom-freedom.go func (h *Handler) Init")
 	h.config = config
 	h.policyManager = pm
 	h.dns = d
@@ -52,6 +55,7 @@ func (h *Handler) Init(config *Config, pm policy.Manager, d dns.Client) error {
 }
 
 func (h *Handler) policy() policy.Session {
+	fmt.Println("in proxy-freedom-freedom.go func (h *Handler) policy()")
 	p := h.policyManager.ForLevel(h.config.UserLevel)
 	if h.config.Timeout > 0 && h.config.UserLevel == 0 {
 		p.Timeouts.ConnectionIdle = time.Duration(h.config.Timeout) * time.Second
@@ -60,6 +64,7 @@ func (h *Handler) policy() policy.Session {
 }
 
 func (h *Handler) resolveIP(ctx context.Context, domain string, localAddr net.Address) net.Address {
+	fmt.Println("in proxy-freedom-freedom.go func (h *Handler) resolveIP")
 	if c, ok := h.dns.(dns.ClientWithIPOption); ok {
 		c.SetFakeDNSOption(false) // Skip FakeDNS
 	} else {
@@ -98,6 +103,7 @@ func isValidAddress(addr *net.IPOrDomain) bool {
 
 // Process implements proxy.Outbound.
 func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer internet.Dialer) error {
+	fmt.Println("in proxy-freedom-freedom.go func (h *Handler) Process")
 	outbound := session.OutboundFromContext(ctx)
 	if outbound == nil || !outbound.Target.IsValid() {
 		return newError("target not specified.")

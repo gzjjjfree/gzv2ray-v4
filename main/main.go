@@ -24,15 +24,15 @@ import (
 var (
 	configFiles cmdarg.Arg // "Config file for V2Ray.", the option is customed type, parse in main
 	configDir   string
-	version     = flag.Bool("version", false, "Show current version of V2Ray.") //
-	test        = flag.Bool("test", false, "Test config file only, without launching V2Ray server.")
+	version     = flag.Bool("version", false, "Show current version of GzV2Ray.") //
+	test        = flag.Bool("test", false, "Test config file only, without launching GzV2Ray server.")
 	format      = flag.String("format", "json", "Format of input file.")
 
 	/* We have to do this here because Golang's Test will also need to parse flag, before
 	 * main func in this file is run.
 	 */
 	_ = func() error { // nolint: unparam  应该会在定义标志时运行
-		flag.Var(&configFiles, "config", "Config file for V2Ray. Multiple assign is accepted (only json). Latter ones overrides the former ones.")
+		flag.Var(&configFiles, "config", "Config file for GzV2Ray. Multiple assign is accepted (only json). Latter ones overrides the former ones.")
 		flag.Var(&configFiles, "c", "Short alias of -config")
 		flag.StringVar(&configDir, "confdir", "", "A dir with multiple json config")
 
@@ -94,10 +94,11 @@ func printVersion() {
 
 func startV2Ray() (core.Server, error) { //Server 是 V2Ray 的一个实例，任何时候都最多只能有一个 Server 实例在运行。函数返回一个实例
 	configFiles := getConfigFilePath()
-	fmt.Println("in startV2ray configFiles: ", configFiles)
+	//fmt.Println("in startV2ray configFiles: ", configFiles)
 	config, err := core.LoadConfig(GetConfigFormat(), configFiles[0], configFiles) // GetConfigFormat() 通过标志 format 定义为 json 文件
 	//fmt.Println("in main Print the *config.app:")
 	//fmt.Println(config.String())
+	//gztest.GetMessageReflectType(config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read config files1: [%v]", configFiles.String())
 	}

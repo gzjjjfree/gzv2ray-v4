@@ -14,7 +14,7 @@ import (
 type StringList []string
 
 func NewStringList(raw []string) *StringList {
-	fmt.Println("in infra-conf-common.go func  NewStringList")
+	//fmt.Println("in infra-conf-common.go func  NewStringList")
 	list := StringList(raw)
 	return &list
 }
@@ -24,7 +24,7 @@ func (v StringList) Len() int {
 }
 
 func (v *StringList) UnmarshalJSON(data []byte) error {
-	fmt.Println("in infra-conf-common.go func (v *StringList) UnmarshalJSON")
+	//fmt.Println("in infra-conf-common.go func (v *StringList) UnmarshalJSON")
 	var strarray []string
 	if err := json.Unmarshal(data, &strarray); err == nil {
 		*v = *NewStringList(strarray)
@@ -45,7 +45,7 @@ type Address struct {
 }
 
 func (v *Address) UnmarshalJSON(data []byte) error {
-	fmt.Println("in infra-conf-common.go func  (v *Address) UnmarshalJSON")
+	//fmt.Println("in infra-conf-common.go func  (v *Address) UnmarshalJSON")
 	var rawStr string
 	if err := json.Unmarshal(data, &rawStr); err != nil {
 		return errors.New("invalid address")
@@ -56,14 +56,14 @@ func (v *Address) UnmarshalJSON(data []byte) error {
 }
 
 func (v *Address) Build() *net.IPOrDomain {
-	fmt.Println("in infra-conf-common.go func (v *Address) Build()")
+	//fmt.Println("in infra-conf-common.go func (v *Address) Build()")
 	return net.NewIPOrDomain(v.Address)
 }
 
 type Network string
 
 func (v Network) Build() net.Network {
-	fmt.Println("in infra-conf-common.go func (v Network) Build()")
+	//fmt.Println("in infra-conf-common.go func (v Network) Build()")
 	switch strings.ToLower(string(v)) {
 	case "tcp":
 		return net.Network_TCP
@@ -79,7 +79,7 @@ func (v Network) Build() net.Network {
 type NetworkList []Network
 
 func (v *NetworkList) UnmarshalJSON(data []byte) error {
-	fmt.Println("in infra-conf-common.go func  (v *NetworkList) UnmarshalJSON")
+	//fmt.Println("in infra-conf-common.go func  (v *NetworkList) UnmarshalJSON")
 	var strarray []Network
 	if err := json.Unmarshal(data, &strarray); err == nil {
 		nl := NetworkList(strarray)
@@ -101,7 +101,7 @@ func (v *NetworkList) UnmarshalJSON(data []byte) error {
 }
 
 func (v *NetworkList) Build() []net.Network {
-	fmt.Println("in infra-conf-common.go func (v *NetworkList) Build()")
+	//fmt.Println("in infra-conf-common.go func (v *NetworkList) Build()")
 	if v == nil {
 		return []net.Network{net.Network_TCP}
 	}
@@ -114,7 +114,7 @@ func (v *NetworkList) Build() []net.Network {
 }
 
 func parseIntPort(data []byte) (net.Port, error) {
-	fmt.Println("in infra-conf-common.go func parseIntPort")
+	//fmt.Println("in infra-conf-common.go func parseIntPort")
 	var intPort uint32
 	err := json.Unmarshal(data, &intPort)
 	if err != nil {
@@ -175,7 +175,7 @@ func (v *PortRange) Build() *net.PortRange {
 
 // UnmarshalJSON implements encoding/json.Unmarshaler.UnmarshalJSON
 func (v *PortRange) UnmarshalJSON(data []byte) error {
-	fmt.Println("in infra-conf-common.go func (v *PortRange) UnmarshalJSON")
+	//fmt.Println("in infra-conf-common.go func (v *PortRange) UnmarshalJSON")
 	port, err := parseIntPort(data)
 	if err == nil {
 		v.From = uint32(port)
@@ -211,7 +211,7 @@ func (list *PortList) Build() *net.PortList {
 
 // UnmarshalJSON implements encoding/json.Unmarshaler.UnmarshalJSON
 func (list *PortList) UnmarshalJSON(data []byte) error {
-	fmt.Println("in infra-conf-common.go func (list *PortList) UnmarshalJSON")
+	//fmt.Println("in infra-conf-common.go func (list *PortList) UnmarshalJSON")
 	var listStr string
 	var number uint32
 	if err := json.Unmarshal(data, &listStr); err != nil {

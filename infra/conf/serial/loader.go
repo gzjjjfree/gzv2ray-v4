@@ -85,13 +85,13 @@ func DecodeJSONConfig(reader io.Reader) (*conf.Config, error) {
 // DecodeJSON reads from reader and decode into target
 // syntax error could be detected.
 func DecodeJSON(reader io.Reader, target interface{}) error {
-	fmt.Println("in infra-conf-serial-loader.go func DecodeJSON ")
+	//fmt.Println("in infra-conf-serial-loader.go func DecodeJSON ")
 	jsonContent := bytes.NewBuffer(make([]byte, 0, 10240))
 	jsonReader := io.TeeReader(&json_reader.Reader{
 		Reader: reader,
 	}, jsonContent)
 	decoder := json.NewDecoder(jsonReader)
-	//fmt.Println("in infra-conf-serial-loader.go func DecodeJSON decoder is:")
+	fmt.Println("in infra-conf-serial-loader.go func DecodeJSON decoder is:")
 	///gztest.GetMessageReflectType(decoder.Buffered)
 	if err := decoder.Decode(target); err != nil {
 		fmt.Println("in infra-conf-serial-loader.go func DecodeJSON err != nil:")
@@ -108,7 +108,7 @@ func DecodeJSON(reader io.Reader, target interface{}) error {
 		}
 		return newError("failed to read config file").Base(err)
 	}
-
+	fmt.Println("in infra-conf-serial-loader.go func DecodeJSON END")
 	return nil
 }
 

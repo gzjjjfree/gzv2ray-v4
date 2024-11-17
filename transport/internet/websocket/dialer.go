@@ -9,6 +9,7 @@ import (
 	"encoding/base64"
 	"io"
 	"time"
+	"fmt"
 
 	core "github.com/gzjjjfree/gzv2ray-v4"
 	"github.com/gzjjjfree/gzv2ray-v4/features/ext"
@@ -24,6 +25,7 @@ import (
 
 // Dial dials a WebSocket connection to the given destination.
 func Dial(ctx context.Context, dest net.Destination, streamSettings *internet.MemoryStreamConfig) (internet.Connection, error) {
+	fmt.Println("in transport-internet-websocket-clialer.go func Dial creating connection to: ", dest)
 	newError("creating connection to ", dest).WriteToLog(session.ExportIDToError(ctx))
 
 	conn, err := dialWebsocket(ctx, dest, streamSettings)
@@ -34,10 +36,12 @@ func Dial(ctx context.Context, dest net.Destination, streamSettings *internet.Me
 }
 
 func init() {
+	fmt.Println("in transport-internet-websocket-clialer.go func init()")
 	common.Must(internet.RegisterTransportDialer(protocolName, Dial))
 }
 
 func dialWebsocket(ctx context.Context, dest net.Destination, streamSettings *internet.MemoryStreamConfig) (net.Conn, error) {
+	fmt.Println("in transport-internet-websocket-clialer.go func dialWebsocket")
 	wsSettings := streamSettings.ProtocolSettings.(*Config)
 
 	dialer := &websocket.Dialer{
@@ -111,6 +115,7 @@ type dialerWithEarlyData struct {
 }
 
 func (d dialerWithEarlyData) Dial(earlyData []byte) (*websocket.Conn, error) {
+	fmt.Println("in transport-internet-websocket-clialer.go func (d dialerWithEarlyData) Dial")
 	earlyDataBuf := bytes.NewBuffer(nil)
 	base64EarlyDataEncoder := base64.NewEncoder(base64.RawURLEncoding, earlyDataBuf)
 
@@ -148,6 +153,7 @@ type dialerWithEarlyDataRelayed struct {
 }
 
 func (d dialerWithEarlyDataRelayed) Dial(earlyData []byte) (io.ReadWriteCloser, error) {
+	fmt.Println("in transport-internet-websocket-clialer.go func (d dialerWithEarlyDataRelayed) Dial")
 	earlyDataBuf := bytes.NewBuffer(nil)
 	base64EarlyDataEncoder := base64.NewEncoder(base64.RawURLEncoding, earlyDataBuf)
 

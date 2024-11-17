@@ -16,6 +16,7 @@ import (
 
 // newFakeDNSSniffer Create a Fake DNS metadata sniffer
 func newFakeDNSSniffer(ctx context.Context) (protocolSnifferWithMetadata, error) {
+	fmt.Println("in app-dispatcher-fackednssniffer.go func newFakeDNSSniffer")
 	var fakeDNSEngine dns.FakeDNSEngine
 	err := core.RequireFeatures(ctx, func(fdns dns.FakeDNSEngine) {
 		fakeDNSEngine = fdns

@@ -44,15 +44,20 @@ type DoHNameServer struct {
 
 // NewDoHNameServer creates DOH server object for remote resolving.
 func NewDoHNameServer(url *url.URL, dispatcher routing.Dispatcher) (*DoHNameServer, error) {
+	fmt.Println("in app-dns-nameserver_doh.go func NewDoHNameServer")
 	fmt.Println("DNS: created Remote DOH client for ", url.String())
 	s := baseDOHNameServer(url, "DOH")
 
 	// Dispatched connection will be closed (interrupted) after each request
+	// 每次请求后，调度连接将被关闭（中断）
 	// This makes DOH inefficient without a keep-alived connection
+	// 如果没有保持连接，DOH 效率会很低
 	// See: core/app/proxyman/outbound/handler.go:113
 	// Using mux (https request wrapped in a stream layer) improves the situation.
+	// 使用 mux（包装在流层中的 https 请求）可以改善这种情况。
 	// Recommend to use NewDoHLocalNameServer (DOHL:) if v2ray instance is running on
 	//  a normal network eg. the server side of v2ray
+	// 如果 v2ray 实例运行在正常网络，例如v2ray服务端
 	tr := &http.Transport{
 		MaxIdleConns:        30,
 		IdleConnTimeout:     90 * time.Second,
@@ -86,6 +91,7 @@ func NewDoHNameServer(url *url.URL, dispatcher routing.Dispatcher) (*DoHNameServ
 
 // NewDoHLocalNameServer creates DOH client object for local resolving
 func NewDoHLocalNameServer(url *url.URL) *DoHNameServer {
+	fmt.Println("in app-dns-nameserver_doh.go func NewDoHLocalNameServer")
 	url.Scheme = "https"
 	s := baseDOHNameServer(url, "DOHL")
 	tr := &http.Transport{
@@ -112,6 +118,7 @@ func NewDoHLocalNameServer(url *url.URL) *DoHNameServer {
 }
 
 func baseDOHNameServer(url *url.URL, prefix string) *DoHNameServer {
+	fmt.Println("in app-dns-nameserver_doh.go func baseDOHNameServer")
 	s := &DoHNameServer{
 		ips:    make(map[string]record),
 		pub:    pubsub.NewService(),
@@ -132,6 +139,7 @@ func (s *DoHNameServer) Name() string {
 
 // Cleanup clears expired items from cache
 func (s *DoHNameServer) Cleanup() error {
+	fmt.Println("in app-dns-nameserver_doh.go func (s *DoHNameServer) Cleanup()")
 	now := time.Now()
 	s.Lock()
 	defer s.Unlock()
@@ -164,6 +172,7 @@ func (s *DoHNameServer) Cleanup() error {
 }
 
 func (s *DoHNameServer) updateIP(req *dnsRequest, ipRec *IPRecord) {
+	fmt.Println("in app-dns-nameserver_doh.go func (s *DoHNameServer) updateIP")
 	elapsed := time.Since(req.start)
 
 	s.Lock()
@@ -209,6 +218,7 @@ func (s *DoHNameServer) newReqID() uint16 {
 }
 
 func (s *DoHNameServer) sendQuery(ctx context.Context, domain string, clientIP net.IP, option dns_feature.IPOption) {
+	fmt.Println("in app-dns-nameserver_doh.go func (s *DoHNameServer) sendQuery")
 	fmt.Println(s.name, " querying: ", domain)
 
 	reqs := buildReqMsgs(domain, option, s.newReqID, genEDNS0Options(clientIP))
@@ -264,6 +274,7 @@ func (s *DoHNameServer) sendQuery(ctx context.Context, domain string, clientIP n
 }
 
 func (s *DoHNameServer) dohHTTPSContext(ctx context.Context, b []byte) ([]byte, error) {
+	fmt.Println("in app-dns-nameserver_doh.go func (s *DoHNameServer) dohHTTPSContext")
 	body := bytes.NewBuffer(b)
 	req, err := http.NewRequest("POST", s.dohURL, body)
 	if err != nil {
@@ -288,6 +299,7 @@ func (s *DoHNameServer) dohHTTPSContext(ctx context.Context, b []byte) ([]byte, 
 }
 
 func (s *DoHNameServer) findIPsForDomain(domain string, option dns_feature.IPOption) ([]net.IP, error) {
+	fmt.Println("in app-dns-nameserver_doh.go func (s *DoHNameServer) findIPsForDomain")
 	s.RLock()
 	record, found := s.ips[domain]
 	s.RUnlock()
@@ -331,6 +343,7 @@ func (s *DoHNameServer) findIPsForDomain(domain string, option dns_feature.IPOpt
 
 // QueryIP implements Server.
 func (s *DoHNameServer) QueryIP(ctx context.Context, domain string, clientIP net.IP, option dns_feature.IPOption, disableCache bool) ([]net.IP, error) { // nolint: dupl
+	fmt.Println("in app-dns-nameserver_doh.go func (s *DoHNameServer) QueryIP")
 	fqdn := Fqdn(domain)
 
 	if disableCache {

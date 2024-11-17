@@ -82,12 +82,16 @@ type Config_DomainStrategy int32
 
 const (
 	// Use domain as is.
+	// 按原样使用域
 	Config_AsIs Config_DomainStrategy = 0
 	// Always resolve IP for domains.
+	// 始终解析域名的 IP
 	Config_UseIp Config_DomainStrategy = 1
 	// Resolve to IP if the domain doesn't match any rules.
+	// 如果域名不符合任何规则，则解析为 IP。
 	Config_IpIfNonMatch Config_DomainStrategy = 2
 	// Resolve to IP if any rule requires IP matching.
+	// 如果任何规则要求 IP 匹配，则解析为 IP。
 	Config_IpOnDemand Config_DomainStrategy = 3
 )
 

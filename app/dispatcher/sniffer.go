@@ -5,6 +5,7 @@ package dispatcher
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common"
 	"github.com/gzjjjfree/gzv2ray-v4/common/protocol/bittorrent"
@@ -32,6 +33,7 @@ type Sniffer struct {
 }
 
 func NewSniffer(ctx context.Context) *Sniffer {
+	fmt.Println("in app-dispatcher-snifffer.go func NewSniffer")
 	ret := &Sniffer{
 		sniffer: []protocolSnifferWithMetadata{
 			{func(c context.Context, b []byte) (SniffResult, error) { return http.SniffHTTP(b) }, false},
@@ -48,6 +50,7 @@ func NewSniffer(ctx context.Context) *Sniffer {
 var errUnknownContent = errors.New("unknown content")
 
 func (s *Sniffer) Sniff(c context.Context, payload []byte) (SniffResult, error) {
+	fmt.Println("in app-dispatcher-snifffer.go func (s *Sniffer) Sniff")
 	var pendingSniffer []protocolSnifferWithMetadata
 	for _, si := range s.sniffer {
 		s := si.protocolSniffer
@@ -74,6 +77,7 @@ func (s *Sniffer) Sniff(c context.Context, payload []byte) (SniffResult, error) 
 }
 
 func (s *Sniffer) SniffMetadata(c context.Context) (SniffResult, error) {
+	fmt.Println("in app-dispatcher-snifffer.go func (s *Sniffer) SniffMetadata")
 	var pendingSniffer []protocolSnifferWithMetadata
 	for _, si := range s.sniffer {
 		s := si.protocolSniffer

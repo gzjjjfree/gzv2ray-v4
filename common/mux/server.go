@@ -25,6 +25,7 @@ type Server struct {
 // NewServer creates a new mux.Server.
 // NewServer 创建一个新的 mux.Server
 func NewServer(ctx context.Context) *Server {
+	fmt.Println("in common-mux-server.go func NewServer")
 	s := &Server{}
 	core.RequireFeatures(ctx, func(d routing.Dispatcher) {
 		s.dispatcher = d
@@ -40,6 +41,7 @@ func (s *Server) Type() interface{} {
 
 // Dispatch implements routing.Dispatcher
 func (s *Server) Dispatch(ctx context.Context, dest net.Destination) (*transport.Link, error) {
+	fmt.Println("in common-mux-server.go func (s *Server) Dispatch")
 	if dest.Address != muxCoolAddress {
 		return s.dispatcher.Dispatch(ctx, dest)
 	}
@@ -78,6 +80,7 @@ type ServerWorker struct {
 }
 
 func NewServerWorker(ctx context.Context, d routing.Dispatcher, link *transport.Link) (*ServerWorker, error) {
+	fmt.Println("in common-mux-server.go func NewServerWorker")
 	worker := &ServerWorker{
 		dispatcher:     d,
 		link:           link,
@@ -88,6 +91,7 @@ func NewServerWorker(ctx context.Context, d routing.Dispatcher, link *transport.
 }
 
 func handle(ctx context.Context, s *Session, output buf.Writer) {
+	fmt.Println("in common-mux-server.go func handle")
 	writer := NewResponseWriter(s.ID, output, s.transferType)
 	if err := buf.Copy(s.input, writer); err != nil {
 		fmt.Println("session  ends.", session.ExportIDToError(ctx))
@@ -107,6 +111,7 @@ func (w *ServerWorker) Closed() bool {
 }
 
 func (w *ServerWorker) handleStatusKeepAlive(meta *FrameMetadata, reader *buf.BufferedReader) error {
+	fmt.Println("in common-mux-server.go func (w *ServerWorker) handleStatusKeepAlive")
 	if meta.Option.Has(OptionData) {
 		return buf.Copy(NewStreamReader(reader), buf.Discard)
 	}
@@ -114,6 +119,7 @@ func (w *ServerWorker) handleStatusKeepAlive(meta *FrameMetadata, reader *buf.Bu
 }
 
 func (w *ServerWorker) handleStatusNew(ctx context.Context, meta *FrameMetadata, reader *buf.BufferedReader) error {
+	fmt.Println("in common-mux-server.go func (w *ServerWorker) handleStatusNew")
 	fmt.Println("received request for ")
 	{
 		msg := &log.AccessMessage{
@@ -160,6 +166,7 @@ func (w *ServerWorker) handleStatusNew(ctx context.Context, meta *FrameMetadata,
 }
 
 func (w *ServerWorker) handleStatusKeep(meta *FrameMetadata, reader *buf.BufferedReader) error {
+	fmt.Println("in common-mux-server.go func (w *ServerWorker) handleStatusKeep")
 	if !meta.Option.Has(OptionData) {
 		return nil
 	}
@@ -193,6 +200,7 @@ func (w *ServerWorker) handleStatusKeep(meta *FrameMetadata, reader *buf.Buffere
 }
 
 func (w *ServerWorker) handleStatusEnd(meta *FrameMetadata, reader *buf.BufferedReader) error {
+	fmt.Println("in common-mux-server.go func (w *ServerWorker) handleStatusEnd")
 	if s, found := w.sessionManager.Get(meta.SessionID); found {
 		if meta.Option.Has(OptionError) {
 			common.Interrupt(s.input)
@@ -207,6 +215,7 @@ func (w *ServerWorker) handleStatusEnd(meta *FrameMetadata, reader *buf.Buffered
 }
 
 func (w *ServerWorker) handleFrame(ctx context.Context, reader *buf.BufferedReader) error {
+	fmt.Println("in common-mux-server.go func (w *ServerWorker) handleFrame")
 	var meta FrameMetadata
 	err := meta.Unmarshal(reader)
 	if err != nil {
@@ -234,6 +243,7 @@ func (w *ServerWorker) handleFrame(ctx context.Context, reader *buf.BufferedRead
 }
 
 func (w *ServerWorker) run(ctx context.Context) {
+	fmt.Println("in common-mux-server.go func (w *ServerWorker) run")
 	input := w.link.Reader
 	reader := &buf.BufferedReader{Reader: input}
 

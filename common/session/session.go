@@ -4,6 +4,7 @@ package session
 import (
 	"context"
 	"math/rand"
+	"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common/net"
 	"github.com/gzjjjfree/gzv2ray-v4/common/protocol"
@@ -14,8 +15,10 @@ import (
 type ID uint32
 
 // NewID generates a new ID. The generated ID is high likely to be unique, but not cryptographically secure.
+// NewID 生成一个新的 ID。生成的 ID 很可能是唯一的，但不具备加密安全性
 // The generated ID will never be 0.
 func NewID() ID {
+	fmt.Println("in common-session-session.go func NewID")
 	for {
 		id := ID(rand.Uint32())
 		if id != 0 {
@@ -29,6 +32,7 @@ func NewID() ID {
 // This can be used with error.WriteToLog().
 // 这可以与 error.WriteToLog() 一起使用。
 func ExportIDToError(ctx context.Context) errors.ExportOption {
+	fmt.Println("in common-session-session.go func ExportIDToError")
 	id := IDFromContext(ctx)
 	return func(h *errors.ExportOptionHolder) {
 		h.SessionID = uint32(id)
@@ -82,6 +86,7 @@ type Sockopt struct {
 
 // SetAttribute attachs additional string attributes to content.
 func (c *Content) SetAttribute(name string, value string) {
+	fmt.Println("in common-session-session.go func  (c *Content) SetAttribute")
 	if c.Attributes == nil {
 		c.Attributes = make(map[string]string)
 	}
@@ -90,6 +95,7 @@ func (c *Content) SetAttribute(name string, value string) {
 
 // Attribute retrieves additional string attributes from content.
 func (c *Content) Attribute(name string) string {
+	fmt.Println("in common-session-session.go func (c *Content) Attribute: ", c.Attributes[name])
 	if c.Attributes == nil {
 		return ""
 	}

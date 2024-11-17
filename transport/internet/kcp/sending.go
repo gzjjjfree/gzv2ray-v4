@@ -6,6 +6,7 @@ package kcp
 import (
 	"container/list"
 	"sync"
+	"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common/buf"
 )
@@ -18,6 +19,7 @@ type SendingWindow struct {
 }
 
 func NewSendingWindow(writer SegmentWriter, onPacketLoss func(uint32)) *SendingWindow {
+	fmt.Println("in transport-internet-kcp-sending.go func NewSendingWindow")
 	window := &SendingWindow{
 		cache:        list.New(),
 		writer:       writer,
@@ -69,6 +71,7 @@ func (sw *SendingWindow) Clear(una uint32) {
 }
 
 func (sw *SendingWindow) HandleFastAck(number uint32, rto uint32) {
+	fmt.Println("in transport-internet-kcp-sending.go func (sw *SendingWindow) HandleFastAck")
 	if sw.IsEmpty() {
 		return
 	}
@@ -99,6 +102,7 @@ func (sw *SendingWindow) Visit(visitor func(seg *DataSegment) bool) {
 }
 
 func (sw *SendingWindow) Flush(current uint32, rto uint32, maxInFlightSize uint32) {
+	fmt.Println("in transport-internet-kcp-sending.go func (sw *SendingWindow) Flush")
 	if sw.IsEmpty() {
 		return
 	}
@@ -132,6 +136,7 @@ func (sw *SendingWindow) Flush(current uint32, rto uint32, maxInFlightSize uint3
 }
 
 func (sw *SendingWindow) Remove(number uint32) bool {
+	fmt.Println("in transport-internet-kcp-sending.go func (sw *SendingWindow) Remove")
 	if sw.IsEmpty() {
 		return false
 	}
@@ -168,6 +173,7 @@ type SendingWorker struct {
 }
 
 func NewSendingWorker(kcp *Connection) *SendingWorker {
+	fmt.Println("in transport-internet-kcp-sending.go func NewSendingWorker")
 	worker := &SendingWorker{
 		conn:             kcp,
 		fastResend:       2,
@@ -199,6 +205,7 @@ func (w *SendingWorker) ProcessReceivingNextWithoutLock(nextNumber uint32) {
 }
 
 func (w *SendingWorker) FindFirstUnacknowledged() {
+	fmt.Println("in transport-internet-kcp-sending.go func (w *SendingWorker) FindFirstUnacknowledged")
 	first := w.firstUnacknowledged
 	if !w.window.IsEmpty() {
 		w.firstUnacknowledged = w.window.FirstNumber()
@@ -224,6 +231,7 @@ func (w *SendingWorker) processAck(number uint32) bool {
 }
 
 func (w *SendingWorker) ProcessSegment(current uint32, seg *AckSegment, rto uint32) {
+	fmt.Println("in transport-internet-kcp-sending.go func (w *SendingWorker) ProcessSegment")
 	defer seg.Release()
 
 	w.Lock()
@@ -261,6 +269,7 @@ func (w *SendingWorker) ProcessSegment(current uint32, seg *AckSegment, rto uint
 }
 
 func (w *SendingWorker) Push(b *buf.Buffer) bool {
+	fmt.Println("in transport-internet-kcp-sending.go func (w *SendingWorker) Push")
 	w.Lock()
 	defer w.Unlock()
 
@@ -291,6 +300,7 @@ func (w *SendingWorker) Write(seg Segment) error {
 }
 
 func (w *SendingWorker) OnPacketLoss(lossRate uint32) {
+	fmt.Println("in transport-internet-kcp-sending.go func (w *SendingWorker) OnPacketLoss")
 	if !w.conn.Config.Congestion || w.conn.roundTrip.Timeout() == 0 {
 		return
 	}
@@ -309,6 +319,7 @@ func (w *SendingWorker) OnPacketLoss(lossRate uint32) {
 }
 
 func (w *SendingWorker) Flush(current uint32) {
+	fmt.Println("in transport-internet-kcp-sending.go func (w *SendingWorker) Flush")
 	w.Lock()
 
 	if w.closed {

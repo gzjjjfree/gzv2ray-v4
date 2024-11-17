@@ -21,7 +21,7 @@ func getAuth(config *Config) (cipher.AEAD, error) {
 		return nil, nil
 	}
 
-	salted := []byte(config.Key + "v2ray-quic-salt")
+	salted := []byte(config.Key + "gzv2ray-quic-salt")
 	key := sha256.Sum256(salted)
 
 	if security == protocol.SecurityType_AES128_GCM {

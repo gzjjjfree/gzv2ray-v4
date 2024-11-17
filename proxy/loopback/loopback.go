@@ -5,6 +5,7 @@ package loopback
 
 import (
 	"context"
+	"fmt"
 
 	core "github.com/gzjjjfree/gzv2ray-v4"
 	"github.com/gzjjjfree/gzv2ray-v4/common"
@@ -24,6 +25,7 @@ type Loopback struct {
 }
 
 func (l *Loopback) Process(ctx context.Context, link *transport.Link, _ internet.Dialer) error {
+	fmt.Println("in proxy-loopback-looopback.go func (l *Loopback) Process")
 	outbound := session.OutboundFromContext(ctx)
 	if outbound == nil || !outbound.Target.IsValid() {
 		return newError("target not specified.")
@@ -107,12 +109,14 @@ func (l *Loopback) Process(ctx context.Context, link *transport.Link, _ internet
 }
 
 func (l *Loopback) init(config *Config, dispatcherInstance routing.Dispatcher) error {
+	fmt.Println("in proxy-loopback-looopback.go func (l *Loopback) init")
 	l.dispatcherInstance = dispatcherInstance
 	l.config = config
 	return nil
 }
 
 func init() {
+	fmt.Println("in proxy-loopback-looopback.go func  init()")
 	common.Must(common.RegisterConfig((*Config)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		l := new(Loopback)
 		err := core.RequireFeatures(ctx, func(dispatcherInstance routing.Dispatcher) error {

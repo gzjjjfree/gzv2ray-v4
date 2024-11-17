@@ -2,7 +2,7 @@ package inbound
 
 import (
 	"context"
-	"fmt"
+	//"fmt"
 
 	
 	"github.com/gzjjjfree/gzv2ray-v4/features"
@@ -14,7 +14,7 @@ import (
 // ManagerType 返回 Manager 接口的类型。可用于实现 common.HasType。
 // v2ray:api:stable
 func ManagerType() interface{} {
-	fmt.Println("in features-inbound-inbound.go func ManagerType()")
+	//fmt.Println("in features-inbound-inbound.go func ManagerType()")
 	return (*Manager)(nil)
 }
 

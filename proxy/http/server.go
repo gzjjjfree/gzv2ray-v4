@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"fmt"
 
 	core "github.com/gzjjjfree/gzv2ray-v4"
 	"github.com/gzjjjfree/gzv2ray-v4/common"
@@ -36,6 +37,7 @@ type Server struct {
 
 // NewServer creates a new HTTP inbound handler.
 func NewServer(ctx context.Context, config *ServerConfig) (*Server, error) {
+	fmt.Println("in proxy-http-server.go func NewServer")
 	v := core.MustFromContext(ctx)
 	s := &Server{
 		config:        config,
@@ -46,6 +48,7 @@ func NewServer(ctx context.Context, config *ServerConfig) (*Server, error) {
 }
 
 func (s *Server) policy() policy.Session {
+	fmt.Println("in proxy-http-server.go func (s *Server) policy()")
 	config := s.config
 	p := s.policyManager.ForLevel(config.UserLevel)
 	if config.Timeout > 0 && config.UserLevel == 0 {
@@ -65,6 +68,7 @@ func isTimeout(err error) bool {
 }
 
 func parseBasicAuth(auth string) (username, password string, ok bool) {
+	fmt.Println("in proxy-http-server.go func  parseBasicAuth")
 	const prefix = "Basic "
 	if !strings.HasPrefix(auth, prefix) {
 		return
@@ -86,6 +90,7 @@ type readerOnly struct {
 }
 
 func (s *Server) Process(ctx context.Context, network net.Network, conn internet.Connection, dispatcher routing.Dispatcher) error {
+	fmt.Println("in proxy-http-server.go func (s *Server) Process")
 	inbound := session.InboundFromContext(ctx)
 	if inbound != nil {
 		inbound.User = &protocol.MemoryUser{
@@ -161,6 +166,7 @@ Start:
 }
 
 func (s *Server) handleConnect(ctx context.Context, _ *http.Request, reader *bufio.Reader, conn internet.Connection, dest net.Destination, dispatcher routing.Dispatcher) error {
+	fmt.Println("in proxy-http-server.go func (s *Server) handleConnect")
 	_, err := conn.Write([]byte("HTTP/1.1 200 Connection established\r\n\r\n"))
 	if err != nil {
 		return newError("failed to write back OK response").Base(err)
@@ -217,6 +223,7 @@ func (s *Server) handleConnect(ctx context.Context, _ *http.Request, reader *buf
 var errWaitAnother = newError("keep alive")
 
 func (s *Server) handlePlainHTTP(ctx context.Context, request *http.Request, writer io.Writer, dest net.Destination, dispatcher routing.Dispatcher) error {
+	fmt.Println("in proxy-http-server.go func  (s *Server) handlePlainHTTP")
 	if !s.config.AllowTransparent && request.URL.Host == "" {
 		// RFC 2068 (HTTP/1.1) requires URL to be absolute URL in HTTP proxy.
 		response := &http.Response{
@@ -325,6 +332,7 @@ func (s *Server) handlePlainHTTP(ctx context.Context, request *http.Request, wri
 }
 
 func init() {
+	fmt.Println("in proxy-http-server.go func init()")
 	common.Must(common.RegisterConfig((*ServerConfig)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		return NewServer(ctx, config.(*ServerConfig))
 	}))

@@ -9,6 +9,7 @@ import (
 	"io"
 	"strconv"
 	"time"
+	"fmt"
 
 	core "github.com/gzjjjfree/gzv2ray-v4"
 	"github.com/gzjjjfree/gzv2ray-v4/common"
@@ -29,6 +30,7 @@ import (
 )
 
 func init() {
+	fmt.Println("in proxy-trojan-server.go func init()")
 	common.Must(common.RegisterConfig((*ServerConfig)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		return NewServer(ctx, config.(*ServerConfig))
 	}))
@@ -43,6 +45,7 @@ type Server struct {
 
 // NewServer creates a new trojan inbound handler.
 func NewServer(ctx context.Context, config *ServerConfig) (*Server, error) {
+	fmt.Println("in proxy-trojan-server.go func NewServer")
 	validator := new(Validator)
 	for _, user := range config.Users {
 		u, err := user.ToMemoryUser()
@@ -102,6 +105,7 @@ func (s *Server) Network() []net.Network {
 
 // Process implements proxy.Inbound.Process().
 func (s *Server) Process(ctx context.Context, network net.Network, conn internet.Connection, dispatcher routing.Dispatcher) error {
+	fmt.Println("in proxy-trojan-server.go func (s *Server) Process")
 	sid := session.ExportIDToError(ctx)
 
 	iConn := conn
@@ -207,6 +211,7 @@ func (s *Server) Process(ctx context.Context, network net.Network, conn internet
 }
 
 func (s *Server) handleUDPPayload(ctx context.Context, clientReader *PacketReader, clientWriter *PacketWriter, dispatcher routing.Dispatcher) error {
+	fmt.Println("in proxy-trojan-server.go func (s *Server) handleUDPPayload")
 	udpServer := udp.NewDispatcher(dispatcher, func(ctx context.Context, packet *udp_proto.Packet) {
 		if err := clientWriter.WriteMultiBufferWithMetadata(buf.MultiBuffer{packet.Payload}, packet.Source); err != nil {
 			newError("failed to write response").Base(err).AtWarning().WriteToLog(session.ExportIDToError(ctx))
@@ -249,6 +254,7 @@ func (s *Server) handleConnection(ctx context.Context, sessionPolicy policy.Sess
 	destination net.Destination,
 	clientReader buf.Reader,
 	clientWriter buf.Writer, dispatcher routing.Dispatcher) error {
+		fmt.Println("in proxy-trojan-server.go func (s *Server) handleConnection")
 	ctx, cancel := context.WithCancel(ctx)
 	timer := signal.CancelAfterInactivity(ctx, cancel, sessionPolicy.Timeouts.ConnectionIdle)
 	ctx = policy.ContextWithBufferPolicy(ctx, sessionPolicy.Buffer)
@@ -287,6 +293,7 @@ func (s *Server) handleConnection(ctx context.Context, sessionPolicy policy.Sess
 }
 
 func (s *Server) fallback(ctx context.Context, sid errors.ExportOption, err error, sessionPolicy policy.Session, connection internet.Connection, iConn internet.Connection, apfb map[string]map[string]*Fallback, first *buf.Buffer, firstLen int64, reader buf.Reader) error {
+	fmt.Println("in proxy-trojan-server.go func (s *Server) fallback")
 	if err := connection.SetReadDeadline(time.Time{}); err != nil {
 		newError("unable to set back read deadline").Base(err).AtWarning().WriteToLog(sid)
 	}

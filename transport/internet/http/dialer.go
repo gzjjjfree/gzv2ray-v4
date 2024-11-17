@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"sync"
+	"fmt"
 
 	"golang.org/x/net/http2"
 
@@ -26,6 +27,7 @@ var (
 )
 
 func getHTTPClient(_ context.Context, dest net.Destination, tlsSettings *tls.Config) *http.Client {
+	fmt.Println("in transport-internet-http-clialer.go func getHTTPClient")
 	globalDialerAccess.Lock()
 	defer globalDialerAccess.Unlock()
 
@@ -85,6 +87,7 @@ func getHTTPClient(_ context.Context, dest net.Destination, tlsSettings *tls.Con
 
 // Dial dials a new TCP connection to the given destination.
 func Dial(ctx context.Context, dest net.Destination, streamSettings *internet.MemoryStreamConfig) (internet.Connection, error) {
+	fmt.Println("in transport-internet-http-clialer.go func Dial dest is: ", dest)
 	httpSettings := streamSettings.ProtocolSettings.(*Config)
 	tlsConfig := tls.ConfigFromStreamSettings(streamSettings)
 	if tlsConfig == nil {
@@ -130,5 +133,6 @@ func Dial(ctx context.Context, dest net.Destination, streamSettings *internet.Me
 }
 
 func init() {
+	fmt.Println("in transport-internet-http-clialer.go func init()")
 	common.Must(internet.RegisterTransportDialer(protocolName, Dial))
 }

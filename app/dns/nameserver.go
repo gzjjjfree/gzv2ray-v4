@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"strings"
 	"time"
+	"fmt"
 
 	core "github.com/gzjjjfree/gzv2ray-v4"
 	"github.com/gzjjjfree/gzv2ray-v4/app/router"
@@ -38,6 +39,7 @@ var errExpectedIPNonMatch = errors.New("expectIPs not match")
 
 // NewServer creates a name server object according to the network destination url.
 func NewServer(dest net.Destination, dispatcher routing.Dispatcher) (Server, error) {
+	fmt.Println("in app-dns-nameserver.go func NewServer")
 	if address := dest.Address; address.Family().IsDomain() {
 		u, err := url.Parse(address.Domain())
 		if err != nil {
@@ -67,6 +69,7 @@ func NewServer(dest net.Destination, dispatcher routing.Dispatcher) (Server, err
 
 // NewClient creates a DNS client managing a name server with client IP, domain rules and expected IPs.
 func NewClient(ctx context.Context, ns *NameServer, clientIP net.IP, container router.GeoIPMatcherContainer, matcherInfos *[]DomainMatcherInfo, updateDomainRule func(strmatcher.Matcher, int, []DomainMatcherInfo) error) (*Client, error) {
+	fmt.Println("in app-dns-nameserver.go func NewClient")
 	client := &Client{}
 
 	err := core.RequireFeatures(ctx, func(dispatcher routing.Dispatcher) error {
@@ -156,6 +159,7 @@ func NewClient(ctx context.Context, ns *NameServer, clientIP net.IP, container r
 
 // NewSimpleClient creates a DNS client with a simple destination.
 func NewSimpleClient(ctx context.Context, endpoint *net.Endpoint, clientIP net.IP) (*Client, error) {
+	fmt.Println("in app-dns-nameserver.go func NewSimpleClient")
 	client := &Client{}
 	err := core.RequireFeatures(ctx, func(dispatcher routing.Dispatcher) error {
 		server, err := NewServer(endpoint.AsDestination(), dispatcher)
@@ -186,6 +190,7 @@ func (c *Client) Name() string {
 
 // QueryIP send DNS query to the name server with the client's IP.
 func (c *Client) QueryIP(ctx context.Context, domain string, option dns.IPOption, disableCache bool) ([]net.IP, error) {
+	fmt.Println("in app-dns-nameserver.go func (c *Client) QueryIP")
 	ctx, cancel := context.WithTimeout(ctx, 4*time.Second)
 	ips, err := c.server.QueryIP(ctx, domain, c.clientIP, option, disableCache)
 	cancel()
@@ -198,6 +203,7 @@ func (c *Client) QueryIP(ctx context.Context, domain string, option dns.IPOption
 
 // MatchExpectedIPs matches queried domain IPs with expected IPs and returns matched ones.
 func (c *Client) MatchExpectedIPs(domain string, ips []net.IP) ([]net.IP, error) {
+	fmt.Println("in app-dns-nameserver.go func (c *Client) MatchExpectedIPs")
 	if len(c.expectIPs) == 0 {
 		return ips, nil
 	}

@@ -3,6 +3,8 @@
 package router
 
 import (
+	"fmt"
+
 	"github.com/gzjjjfree/gzv2ray-v4/common/dice"
 	"github.com/gzjjjfree/gzv2ray-v4/features/outbound"
 )
@@ -30,6 +32,7 @@ type Balancer struct {
 }
 
 func (b *Balancer) PickOutbound() (string, error) {
+	fmt.Println("in app-router-balancing.go func (b *Balancer) PickOutbound()")
 	hs, ok := b.ohm.(outbound.HandlerSelector)
 	if !ok {
 		return "", newError("outbound.Manager is not a HandlerSelector")

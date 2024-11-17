@@ -5,6 +5,7 @@ import (
 	"sort"
 	"strings"
 	"errors"
+	"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/app/dns"
 	"github.com/gzjjjfree/gzv2ray-v4/app/router"
@@ -21,6 +22,7 @@ type NameServerConfig struct {
 }
 
 func (c *NameServerConfig) UnmarshalJSON(data []byte) error {
+	fmt.Println("in infa-conf-dns.go func (c *NameServerConfig) UnmarshalJSON")
 	var address Address
 	if err := json.Unmarshal(data, &address); err == nil {
 		c.Address = &address
@@ -49,6 +51,7 @@ func (c *NameServerConfig) UnmarshalJSON(data []byte) error {
 }
 
 func toDomainMatchingType(t router.Domain_Type) dns.DomainMatchingType {
+	fmt.Println("in infa-conf-dns.go func toDomainMatchingType")
 	switch t {
 	case router.Domain_Domain:
 		return dns.DomainMatchingType_Subdomain
@@ -64,7 +67,9 @@ func toDomainMatchingType(t router.Domain_Type) dns.DomainMatchingType {
 }
 
 func (c *NameServerConfig) Build() (*dns.NameServer, error) {
+	fmt.Println("in infa-conf-dns.go func (c *NameServerConfig) Build() c.Address: ", c.Address)
 	if c.Address == nil {
+		fmt.Println("in infa-conf-dns.go func (c *NameServerConfig) Build() c.Address == nil")
 		return nil, errors.New("nameServer address is not specified")
 	}
 
@@ -96,6 +101,7 @@ func (c *NameServerConfig) Build() (*dns.NameServer, error) {
 
 	var myClientIP []byte
 	if c.ClientIP != nil {
+		fmt.Println("in infa-conf-dns.go func (c *NameServerConfig) Build() c.ClientIP != nil")
 		if !c.ClientIP.Family().IsIP() {
 			return nil, errors.New("not an IP address")
 		}
@@ -135,6 +141,7 @@ type DNSConfig struct {
 }
 
 func getHostMapping(addr *Address) *dns.Config_HostMapping {
+	fmt.Println("in infa-conf-dns.go func getHostMapping")
 	if addr.Family().IsIP() {
 		return &dns.Config_HostMapping{
 			Ip: [][]byte{[]byte(addr.IP())},
@@ -147,6 +154,7 @@ func getHostMapping(addr *Address) *dns.Config_HostMapping {
 
 // Build implements Buildable
 func (c *DNSConfig) Build() (*dns.Config, error) {
+	fmt.Println("in infa-conf-dns.go func (c *DNSConfig) Build()")
 	config := &dns.Config{
 		Tag:             c.Tag,
 		DisableCache:    c.DisableCache,

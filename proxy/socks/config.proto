@@ -3,7 +3,7 @@ syntax = "proto3";
 package gzv2ray.core.proxy.socks;
 option csharp_namespace = "GzV2Ray.Core.Proxy.Socks";
 option go_package = "github.com/gzjjjfree/gzv2ray-v4/proxy/socks";
-option java_package = "com.v2ray.core.proxy.socks";
+option java_package = "com.gzv2ray.core.proxy.socks";
 option java_multiple_files = true;
 
 import "common/net/address.proto";
