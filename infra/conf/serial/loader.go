@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"io"
 
-	"example.com/gztest"
+	//"example.com/gztest"
 
 	core "github.com/gzjjjfree/gzv2ray-v4"
 	"github.com/gzjjjfree/gzv2ray-v4/infra/conf"
@@ -95,18 +95,18 @@ func DecodeJSON(reader io.Reader, target interface{}) error {
 	///gztest.GetMessageReflectType(decoder.Buffered)
 	if err := decoder.Decode(target); err != nil {
 		fmt.Println("in infra-conf-serial-loader.go func DecodeJSON err != nil:")
-		var pos *offset
-		cause := gztest.Cause(err)
-		switch tErr := cause.(type) {
-		case *json.SyntaxError:
-			pos = findOffset(jsonContent.Bytes(), int(tErr.Offset))
-		case *json.UnmarshalTypeError:
-			pos = findOffset(jsonContent.Bytes(), int(tErr.Offset))
-		}
-		if pos != nil {
-			return newError("failed to read config file at line ", pos.line, " char ", pos.char).Base(err)
-		}
-		return newError("failed to read config file").Base(err)
+		//var pos *offset
+		//cause := gztest.Cause(err)
+		//switch tErr := cause.(type) {
+		//case *json.SyntaxError:
+		//	pos = findOffset(jsonContent.Bytes(), int(tErr.Offset))
+		//case *json.UnmarshalTypeError:
+		//	pos = findOffset(jsonContent.Bytes(), int(tErr.Offset))
+		//}
+		//if pos != nil {
+		//	return newError("failed to read config file at line ", pos.line, " char ", pos.char).Base(err)
+		//}
+		return err
 	}
 	fmt.Println("in infra-conf-serial-loader.go func DecodeJSON END")
 	return nil

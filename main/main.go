@@ -18,7 +18,7 @@ import (
 	"github.com/gzjjjfree/gzv2ray-v4/common/cmdarg"
 	"github.com/gzjjjfree/gzv2ray-v4/common/platform"
 	_ "github.com/gzjjjfree/gzv2ray-v4/main/distro/all"
-	_ "github.com/gzjjjfree/gzv2ray-v4/main/loadfile"
+	//_ "github.com/gzjjjfree/gzv2ray-v4/main/loadfile"
 )
 
 var (

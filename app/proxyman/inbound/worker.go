@@ -8,7 +8,7 @@ import (
 	"errors"
 	"fmt"
 
-	"example.com/gztest"
+	//"example.com/gztest"
 
 	"github.com/gzjjjfree/gzv2ray-v4/app/proxyman"
 	"github.com/gzjjjfree/gzv2ray-v4/common"
@@ -68,7 +68,7 @@ func (w *tcpWorker) callback(conn internet.Connection) {
 	if w.recvOrigDest {
 		var dest net.Destination
 		fmt.Println("getTProxyType(w.stream) is: ")
-		gztest.GetMessageReflectType(getTProxyType(w.stream))
+		//gztest.GetMessageReflectType(getTProxyType(w.stream))
 		switch getTProxyType(w.stream) {
 		case internet.SocketConfig_Redirect:
 			d, err := tcp.GetOriginalDestination(conn)

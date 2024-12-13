@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	//"reflect"
-	"example.com/gztest"
+	//"example.com/gztest"
 
 	//"example.com/gztest"
 	core "github.com/gzjjjfree/gzv2ray-v4"
@@ -71,7 +71,7 @@ func NewAlwaysOnInboundHandler(ctx context.Context, tag string, receiverConfig *
 	}
 	//fmt.Println("the mux.NewServer type is: %T", reflect.TypeOf(h.mux))
 	//fmt.Println("the mux.NewServer type is: %T", h.mux)
-	gztest.GetMessageReflectType(*h.mux)
+	//gztest.GetMessageReflectType(*h.mux)
 	uplinkCounter, downlinkCounter := getStatCounter(core.MustFromContext(ctx), tag)
 
 	nl := p.Network()

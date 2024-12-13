@@ -3,7 +3,7 @@ module github.com/gzjjjfree/gzv2ray-v4
 go 1.23.2
 
 require (
-	example.com/gztest v0.0.0-00010101000000-000000000000
+	//example.com/gztest v0.0.0-00010101000000-000000000000
 	github.com/riobard/go-bloom v0.0.0-20200614022211-cdc8013cb5b3
 	github.com/seiflotfy/cuckoofilter v0.0.0-20240715131351-a2f2c23f1771
 	go.starlark.net v0.0.0-20240925182052-1207426daebd
@@ -35,4 +35,4 @@ require (
 	google.golang.org/protobuf v1.35.1
 )
 
-replace example.com/gztest => ../../gztest
+//replace example.com/gztest => ../../gztest

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"example.com/gztest"
+	//"example.com/gztest"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common"
 	"github.com/gzjjjfree/gzv2ray-v4/features/policy"
@@ -19,7 +19,7 @@ type Instance struct {
 // New creates new Policy manager instance.
 func New(ctx context.Context, config *Config) (*Instance, error) {
 	fmt.Println("in app-policy-manager.go func New")
-	gztest.GetMessageReflectType(config)
+	//gztest.GetMessageReflectType(config)
 	m := &Instance{
 		levels: make(map[uint32]*Policy),
 		system: config.System,

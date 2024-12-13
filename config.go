@@ -9,7 +9,7 @@ import (
 	"io"
 	"strings"
 
-	"example.com/gztest"
+	//"example.com/gztest"
 
 	"google.golang.org/protobuf/proto"
 
@@ -101,8 +101,8 @@ func loadProtobufConfig(data []byte) (*Config, error) {
 	if err := proto.Unmarshal(data, config); err != nil {
 		return nil, err
 	}
-	fmt.Println("in config.go Print the *config.app:")
-	gztest.GetMessageReflectType(config.App)
+	//fmt.Println("in config.go Print the *config.app:")
+	//est.GetMessageReflectType(config.App)
 	return config, nil
 }
 

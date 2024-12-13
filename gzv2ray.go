@@ -10,7 +10,7 @@ import (
 	"reflect"
 	"sync"
 
-	"example.com/gztest" //gztest.GetMessageReflectType(appSettings)
+	//"example.com/gztest" //gztest.GetMessageReflectType(appSettings)
 
 	"github.com/gzjjjfree/gzv2ray-v4/common"
 	"github.com/gzjjjfree/gzv2ray-v4/features"
@@ -232,7 +232,7 @@ func (s *Instance) AddFeature(feature features.Feature) error {
 
 func (r *resolution) resolve(allFeatures []features.Feature) (bool, error) { // resoleve 解析接口
 	fmt.Println("in gzv2ray.go func (r *resolution) resolve")
-	gztest.GetMessageReflectType(r.deps)
+	//gztest.GetMessageReflectType(r.deps)
 	var fs []features.Feature
 	// r 是  Feature 类型列表及回调函数
 	for _, d := range r.deps {
