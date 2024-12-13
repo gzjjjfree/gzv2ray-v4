@@ -163,7 +163,7 @@ func (m *Manager) Select(selectors []string) []string {
 }
 
 func init() {
-	fmt.Println("is run ./app/proxyman/inbound/onbound.go func init ")
+	fmt.Println("in is run ./app/proxyman/inbound/onbound.go func init ")
 	common.Must(common.RegisterConfig((*proxyman.OutboundConfig)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		return New(ctx, config.(*proxyman.OutboundConfig))
 	}))

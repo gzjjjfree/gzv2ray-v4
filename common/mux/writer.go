@@ -65,6 +65,7 @@ func (w *Writer) writeMetaOnly() error {
 }
 
 func writeMetaWithFrame(writer buf.Writer, meta FrameMetadata, data buf.MultiBuffer) error {
+	fmt.Println("in common-mux-writer.go func writeMetaWithFrame")
 	frame := buf.New()
 	if err := meta.WriteTo(frame); err != nil {
 		return err
@@ -92,9 +93,11 @@ func (w *Writer) writeData(mb buf.MultiBuffer) error {
 
 // WriteMultiBuffer implements buf.Writer.
 func (w *Writer) WriteMultiBuffer(mb buf.MultiBuffer) error {
+	fmt.Println("in common-mux-writer.go func (w *Writer) WriteMultiBuffer")
 	defer buf.ReleaseMulti(mb)
 
 	if mb.IsEmpty() {
+		fmt.Println("in common-mux-writer.go func (w *Writer) WriteMultiBuffer mb.IsEmpty() == true")
 		return w.writeMetaOnly()
 	}
 

@@ -110,6 +110,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	}
 	destination := outbound.Target
 	if h.config.DestinationOverride != nil {
+		fmt.Println("in proxy-freedom-freedom.go func (h *Handler) Process DestinationOverride != nil")
 		server := h.config.DestinationOverride.Server
 		if isValidAddress(server.Address) {
 			destination.Address = server.Address.AsAddress()
@@ -124,8 +125,10 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	output := link.Writer
 
 	var conn internet.Connection
+	// ExponentialBackoff 试执行5次 on 里的 func，中间间隔 100 毫秒，当无错时立即返回
 	err := retry.ExponentialBackoff(5, 100).On(func() error {
 		dialDest := destination
+		//fmt.Println("in proxy-freedom-freedom.go func (h *Handler) Process useIP(): ", h.config.useIP(), " c.d: ", h.config.DomainStrategy)
 		if h.config.useIP() && dialDest.Address.Family().IsDomain() {
 			ip := h.resolveIP(ctx, dialDest.Address.Domain(), dialer.Address())
 			if ip != nil {
@@ -186,7 +189,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 
 		return nil
 	}
-
+    // Run 轮流阻塞执行参数里的函数，OnSuccess 设置超时退出
 	if err := task.Run(ctx, requestDone, task.OnSuccess(responseDone, task.Close(output))); err != nil {
 		return newError("connection ends").Base(err)
 	}

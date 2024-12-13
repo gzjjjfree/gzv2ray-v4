@@ -59,11 +59,12 @@ func getTProxyType(s *internet.MemoryStreamConfig) internet.SocketConfig_TProxyM
 }
 
 func (w *tcpWorker) callback(conn internet.Connection) {
-	fmt.Println("in  app-proxyman-inbound-worker.go func (w *tcpWorker) callback")
+	//fmt.Println("in  app-proxyman-inbound-worker.go func (w *tcpWorker) callback")
 	ctx, cancel := context.WithCancel(w.ctx)
+	fmt.Println("in  app-proxyman-inbound-worker.go func (w *tcpWorker) callback ctx: ", ctx)
 	sid := session.NewID()
 	ctx = session.ContextWithID(ctx, sid)
-
+	//fmt.Println("in  app-proxyman-inbound-worker.go func (w *tcpWorker) callback ctx: ", ctx)
 	if w.recvOrigDest {
 		var dest net.Destination
 		fmt.Println("getTProxyType(w.stream) is: ")
@@ -98,6 +99,7 @@ func (w *tcpWorker) callback(conn internet.Connection) {
 		content.SniffingRequest.MetadataOnly = w.sniffingConfig.MetadataOnly
 	}
 	ctx = session.ContextWithContent(ctx, content)
+	//fmt.Println("in  app-proxyman-inbound-worker.go func (w *tcpWorker) callback ctx: ", ctx)
 	if w.uplinkCounter != nil || w.downlinkCounter != nil {
 		fmt.Println("in  app-proxyman-inbound-worker.go func (w *tcpWorker) callback w.uplinkCounter != nil || w.downlinkCounter != nil")
 		conn = &internet.StatCouterConnection{
@@ -106,6 +108,8 @@ func (w *tcpWorker) callback(conn internet.Connection) {
 			WriteCounter: w.downlinkCounter,
 		}
 	}
+	//gztest.GetMessageReflectType(w.proxy)
+	//fmt.Printf("Value pointed by Ptr: %v\n", *proxy.Inbound)
 	if err := w.proxy.Process(ctx, net.Network_TCP, conn, w.dispatcher); err != nil {
 		errors.New("connection ends")
 	}

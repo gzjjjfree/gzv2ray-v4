@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	//"example.com/gztest"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common"
 	"github.com/gzjjjfree/gzv2ray-v4/common/protocol/bittorrent"
@@ -41,9 +42,9 @@ func NewSniffer(ctx context.Context) *Sniffer {
 			{func(c context.Context, b []byte) (SniffResult, error) { return bittorrent.SniffBittorrent(b) }, false},
 		},
 	}
-	if sniffer, err := newFakeDNSSniffer(ctx); err == nil {
-		ret.sniffer = append(ret.sniffer, sniffer)
-	}
+	//if sniffer, err := newFakeDNSSniffer(ctx); err == nil {
+	//	ret.sniffer = append(ret.sniffer, sniffer)
+	//}
 	return ret
 }
 
@@ -80,11 +81,13 @@ func (s *Sniffer) SniffMetadata(c context.Context) (SniffResult, error) {
 	fmt.Println("in app-dispatcher-snifffer.go func (s *Sniffer) SniffMetadata")
 	var pendingSniffer []protocolSnifferWithMetadata
 	for _, si := range s.sniffer {
+		//gztest.GetMessageReflectType(si)
 		s := si.protocolSniffer
 		if !si.metadataSniffer {
 			pendingSniffer = append(pendingSniffer, si)
 			continue
 		}
+		fmt.Println("in app-dispatcher-snifffer.go func (s *Sniffer) SniffMetadata after continue")
 		result, err := s(c, nil)
 		if err == common.ErrNoClue {
 			pendingSniffer = append(pendingSniffer, si)

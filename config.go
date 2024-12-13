@@ -107,7 +107,7 @@ func loadProtobufConfig(data []byte) (*Config, error) {
 }
 
 func init() {
-	fmt.Println("is run ./config.go func init ")
+	fmt.Println("in is run ./config.go func init ")
 	common.Must(RegisterConfigLoader(&ConfigFormat{
 		Name:      "Protobuf",
 		Extension: []string{"pb"},

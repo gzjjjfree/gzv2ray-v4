@@ -42,6 +42,7 @@ func (*Instance) Type() interface{} {
 
 // ForLevel implements policy.Manager.
 func (m *Instance) ForLevel(level uint32) policy.Session {
+	fmt.Println("in app-poolicy-manager.go func (m *Instance) ForLevel")
 	if p, ok := m.levels[level]; ok {
 		return p.ToCorePolicy()
 	}
@@ -69,7 +70,7 @@ func (m *Instance) Close() error {
 }
 
 func init() {
-	fmt.Println("is run ./app/policy/manager.go func init ")
+	fmt.Println("in is run ./app/policy/manager.go func init ")
 	common.Must(common.RegisterConfig((*Config)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		return New(ctx, config.(*Config))
 	}))

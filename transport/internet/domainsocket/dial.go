@@ -21,7 +21,7 @@ func Dial(ctx context.Context, dest net.Destination, streamSettings *internet.Me
 
 	conn, err := net.DialUnix("unix", nil, addr)
 	if err != nil {
-		return nil, newError("failed to dial unix: ", settings.Path).Base(err).AtWarning()
+		return nil, err
 	}
 
 	if config := tls.ConfigFromStreamSettings(streamSettings); config != nil {

@@ -19,6 +19,7 @@ import (
 	"github.com/gzjjjfree/gzv2ray-v4/transport"
 	"github.com/gzjjjfree/gzv2ray-v4/transport/internet"
 	"github.com/gzjjjfree/gzv2ray-v4/transport/pipe"
+	"github.com/gzjjjfree/gzv2ray-v4/common/serial"
 )
 
 
@@ -152,24 +153,25 @@ func (f *DialingWorkerFactory) Create() (*ClientWorker, error) {
 	opts := []pipe.Option{pipe.WithSizeLimit(64 * 1024)}
 	uplinkReader, upLinkWriter := pipe.New(opts...)
 	downlinkReader, downlinkWriter := pipe.New(opts...)
-
+	
 	c, err := NewClientWorker(transport.Link{
 		Reader: downlinkReader,
 		Writer: upLinkWriter,
 	}, f.Strategy)
-
+	
 	if err != nil {
 		return nil, err
 	}
 
 	go func(p proxy.Outbound, d internet.Dialer, c common.Closable) {
+		fmt.Println("in common-mux-client.go func  (f *DialingWorkerFactory) Create() go func")
 		ctx := session.ContextWithOutbound(f.ctx, &session.Outbound{
 			Target: net.TCPDestination(muxCoolAddress, muxCoolPort),
 		})
 		ctx, cancel := context.WithCancel(ctx)
-
+		
 		if err := p.Process(ctx, &transport.Link{Reader: uplinkReader, Writer: downlinkWriter}, d); err != nil {
-			fmt.Println("failed to handler mux client connection")
+			//fmt.Println("failed to handler mux client connection err: ", err)
 		}
 		fmt.Println("in common-mux-client.go func  (f *DialingWorkerFactory) Create()  common.Must(c.Close())")
 		common.Must(c.Close())
@@ -243,6 +245,7 @@ func (m *ClientWorker) monitor() {
 }
 
 func writeFirstPayload(reader buf.Reader, writer *Writer) error {
+	fmt.Println("in common-mux-client.go func writeFirstPayload")
 	err := buf.CopyOnceTimeout(reader, writer, time.Millisecond*100)
 	if err == buf.ErrNotTimeoutReader || err == buf.ErrReadTimeout {
 		return writer.WriteMultiBuffer(buf.MultiBuffer{})
@@ -256,6 +259,7 @@ func writeFirstPayload(reader buf.Reader, writer *Writer) error {
 }
 
 func fetchInput(ctx context.Context, s *Session, output buf.Writer) {
+	fmt.Println("in common-mux-client.go func fetchInput")
 	dest := session.OutboundFromContext(ctx).Target
 	transferType := protocol.TransferTypeStream
 	if dest.Network == net.Network_UDP {
@@ -266,16 +270,17 @@ func fetchInput(ctx context.Context, s *Session, output buf.Writer) {
 	defer s.Close()
 	defer writer.Close()
 
-	fmt.Println("dispatching request to ")
+	//fmt.Println("dispatching request to ")
 	if err := writeFirstPayload(s.input, writer); err != nil {
 		fmt.Println("failed to write first payload")
 		writer.hasError = true
 		common.Interrupt(s.input)
 		return
 	}
-
+	//for i:=0;i<100000;i++{errors.New("ok")}
+	fmt.Println("in common-mux-client.go func fetchInput buf.Copy")
 	if err := buf.Copy(s.input, writer); err != nil {
-		fmt.Println("failed to fetch all input")
+		//fmt.Println("failed to fetch all input")
 		writer.hasError = true
 		common.Interrupt(s.input)
 		return
@@ -303,6 +308,7 @@ func (m *ClientWorker) IsFull() bool {
 }
 
 func (m *ClientWorker) Dispatch(ctx context.Context, link *transport.Link) bool {
+	fmt.Println("in common-mux-client.go func (m *ClientWorker) Dispatch")
 	if m.IsFull() || m.Closed() {
 		return false
 	}
@@ -319,6 +325,7 @@ func (m *ClientWorker) Dispatch(ctx context.Context, link *transport.Link) bool 
 }
 
 func (m *ClientWorker) handleStatueKeepAlive(meta *FrameMetadata, reader *buf.BufferedReader) error {
+	fmt.Println("in common-mux-client.go func (m *ClientWorker) handleStatueKeepAlive")
 	if meta.Option.Has(OptionData) {
 		return buf.Copy(NewStreamReader(reader), buf.Discard)
 	}
@@ -326,6 +333,7 @@ func (m *ClientWorker) handleStatueKeepAlive(meta *FrameMetadata, reader *buf.Bu
 }
 
 func (m *ClientWorker) handleStatusNew(meta *FrameMetadata, reader *buf.BufferedReader) error {
+	fmt.Println("in common-mux-client.go func (m *ClientWorker) handleStatusNew meta.Option.Has(OptionData): ", meta.Option.Has(OptionData))
 	if meta.Option.Has(OptionData) {
 		return buf.Copy(NewStreamReader(reader), buf.Discard)
 	}
@@ -389,12 +397,13 @@ func (m *ClientWorker) fetchOutput() {
 	for {
 		err := meta.Unmarshal(reader)
 		if err != nil {
-			if errors.Unwrap(err) != io.EOF {
+			fmt.Println("in common-mux-clien.go func (m *ClientWorker) fetchOutput() meta.Unmarshal(reader) err: ", err)
+			if serial.ToString(err) != serial.ToString(io.EOF) && serial.ToString(err)[:2] != "io" && serial.ToString(err)[:2] != "re" {
 				fmt.Println("failed to read metadata")
 			}
 			break
 		}
-
+		//fmt.Println("in common-mux-clien.go func (m *ClientWorker) fetchOutput() meta.SessionStatus: ", meta.SessionStatus)
 		switch meta.SessionStatus {
 		case SessionStatusKeepAlive:
 			err = m.handleStatueKeepAlive(&meta, reader)
@@ -411,7 +420,7 @@ func (m *ClientWorker) fetchOutput() {
 		}
 
 		if err != nil {
-			fmt.Println("failed to process data")
+			fmt.Println("in common-mux-clien.go func (m *ClientWorker) fetchOutput() failed to process data")
 		}
 	}
 }

@@ -25,7 +25,7 @@ func (r reflectionService) Register(s *grpc.Server) {
 }
 
 func init() {
-	fmt.Println("is run ./app/commander/service.go func init ")
+	fmt.Println("in is run ./app/commander/service.go func init ")
 	common.Must(common.RegisterConfig((*ReflectionConfig)(nil), func(ctx context.Context, cfg interface{}) (interface{}, error) {
 		return reflectionService{}, nil
 	}))

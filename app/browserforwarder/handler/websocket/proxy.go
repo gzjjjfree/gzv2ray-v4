@@ -22,7 +22,7 @@ func (fn netDialerFunc) Dial(network, addr string) (net.Conn, error) {
 }
 
 func init() {
-	fmt.Println("is run ./app/browserforwarder/handler/websocket/proxy.go func init ")
+	fmt.Println("in is run ./app/browserforwarder/handler/websocket/proxy.go func init ")
 	proxy_RegisterDialerType("http", func(proxyURL *url.URL, forwardDialer proxy_Dialer) (proxy_Dialer, error) {
 		return &httpProxyDialer{proxyURL: proxyURL, forwardDial: forwardDialer.Dial}, nil
 	})

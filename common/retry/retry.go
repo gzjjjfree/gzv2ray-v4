@@ -16,7 +16,9 @@ type Strategy interface {
 }
 
 type retryer struct {
+	// 连接次数
 	totalAttempt int
+	// 连接间隔
 	nextDelay    func() uint32
 }
 
@@ -34,6 +36,7 @@ func (r *retryer) On(method func() error) error {
 			accumulatedError = append(accumulatedError, err)
 		}
 		delay := r.nextDelay()
+		// 等待延时 dalay 后再执行后续
 		time.Sleep(time.Duration(delay) * time.Millisecond)
 		attempt++
 	}

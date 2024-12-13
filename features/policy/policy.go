@@ -4,6 +4,7 @@ import (
 	"time"
 	"runtime"
 	"context"
+	//"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/features"
 	"github.com/gzjjjfree/gzv2ray-v4/common/platform"
@@ -134,11 +135,14 @@ func init() {
 }
 
 // SessionDefault returns the Policy when user is not specified.
+// 当未指定用户时，SessionDefault 返回 Policy
 func SessionDefault() Session {
+	//fmt.Println("in features-policy-policy.go func SessionDefault()")
 	return Session{
 		Timeouts: Timeout{
 			// Align Handshake timeout with nginx client_header_timeout
 			// So that this value will not indicate server identity
+			// 将握手超时与 nginx client_header_timeout 对齐, 这样该值就不会表明服务器身份
 			Handshake:      time.Second * 60,
 			ConnectionIdle: time.Second * 300,
 			UplinkOnly:     time.Second * 1,
@@ -163,8 +167,11 @@ func ContextWithBufferPolicy(ctx context.Context, p Buffer) context.Context {
 }
 
 func BufferPolicyFromContext(ctx context.Context) Buffer {
+	//fmt.Println("in features-policy-policy.go func BufferPolicyFromContext ctx: ", ctx)
 	pPolicy := ctx.Value(bufferPolicyKey)
+	//fmt.Println("in features-policy-policy.go func BufferPolicyFromContext pPolicy: ", pPolicy)
 	if pPolicy == nil {
+		//fmt.Println("in features-policy-policy.go func BufferPolicyFromContext pPolicy == nil")
 		return defaultBufferPolicy()
 	}
 	return pPolicy.(Buffer)

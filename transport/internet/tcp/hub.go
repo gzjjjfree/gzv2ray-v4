@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"errors"
 
+	//"example.com/gztest"
 	"github.com/gzjjjfree/gzv2ray-v4/common"
 	"github.com/gzjjjfree/gzv2ray-v4/common/net"
 	//"github.com/gzjjjfree/gzv2ray-v4/common/session"
@@ -37,10 +38,14 @@ func ListenTCP(ctx context.Context, address net.Address, port net.Port, streamSe
 	tcpSettings := streamSettings.ProtocolSettings.(*Config)
 	l.config = tcpSettings
 	if l.config != nil {
+		fmt.Println("in transport-internet-tcp-hub.go func ListenTCP l.config != nil: ", l.config)
 		if streamSettings.SocketSettings == nil {
+			
 			streamSettings.SocketSettings = &internet.SocketConfig{}
+			//gztest.GetMessageReflectType(streamSettings.SocketSettings)
 		}
 		streamSettings.SocketSettings.AcceptProxyProtocol = l.config.AcceptProxyProtocol
+		
 	}
 	var listener net.Listener
 	var err error
@@ -58,6 +63,8 @@ func ListenTCP(ctx context.Context, address net.Address, port net.Port, streamSe
 			l.locker = locker.(*internet.FileLocker)
 		}
 	} else {
+		fmt.Println("in transport-internet-tcp-hub.go func ListenTCP ctx: ", ctx)
+		//gztest.GetMessageReflectType(streamSettings.SocketSettings)
 		listener, err = internet.ListenSystem(ctx, &net.TCPAddr{
 			IP:   address.IP(),
 			Port: int(port),
@@ -91,6 +98,7 @@ func ListenTCP(ctx context.Context, address net.Address, port net.Port, streamSe
 	}
 // 开启一个协程，监听接收的数据
 	go l.keepAccepting()
+	//fmt.Println("测试 callback 顺序 in hub.go ListenTCP")
 	return l, nil
 }
 
@@ -123,6 +131,7 @@ func (v *Listener) keepAccepting() {
 		}
 		fmt.Println("转入下一个 TCP 连接")
 		v.addConn(internet.Connection(conn))
+		//fmt.Println("测试 callback 顺序")
 	}
 	fmt.Println("in transport-internet-tcp-hub.go func (v *Listener) keepAccepting()  END")
 }

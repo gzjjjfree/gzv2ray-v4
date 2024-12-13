@@ -13,7 +13,7 @@ import (
 func CreateObject(ctx context.Context, config interface{}) (interface{}, error) {
 	// 包reflect实现了运行时反射，允许程序操作任意类型的对象。典型的用途是使用静态类型interface{}获取一个值，并通过调用TypeOf（返回一个Type）来提取其动态类型信息。
 	configType := reflect.TypeOf(config)
-	//fmt.Println("in common-type.go func CreateObject configType: ", configType)
+	fmt.Println("in common-type.go func CreateObject configType: ", configType)
 	
 	creator, found := typeCreatorRegistry[configType]
 	if !found {
@@ -38,7 +38,7 @@ var (
 func RegisterConfig(config interface{}, configCreator ConfigCreator) error {
 	
 	configType := reflect.TypeOf(config)
-	//fmt.Println("in common-type.go func RegisterConfig : ", configType)
+	fmt.Println("in common-type.go func RegisterConfig : ", configType)
 	if _, found := typeCreatorRegistry[configType]; found {
 		return errors.New(configType.Name() + " is already registered")
 	}

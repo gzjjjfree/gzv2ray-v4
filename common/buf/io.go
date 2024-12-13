@@ -59,17 +59,17 @@ func isPacketReader(reader io.Reader) bool {
 // The Reader instance doesn't take the ownership of reader.
 // Reader 实例不拥有 reader 的所有权。
 func NewReader(reader io.Reader) Reader {
-	//fmt.Println("in common-buf-io.go func NewReader ")
+    fmt.Println("in common-buf-io.go func NewReader return mr")
 	if mr, ok := reader.(Reader); ok {
 		return mr
 	}
-
+	fmt.Println("in common-buf-io.go func NewReader return PacketReader")
 	if isPacketReader(reader) {
 		return &PacketReader{
 			Reader: reader,
 		}
 	}
-
+	fmt.Println("in common-buf-io.go func NewReader return NewReadVReader(reader, rawConn)")
 	_, isFile := reader.(*os.File)
 	if !isFile && useReadv {
 		if sc, ok := reader.(syscall.Conn); ok {
@@ -81,7 +81,7 @@ func NewReader(reader io.Reader) Reader {
 			}
 		}
 	}
-
+	fmt.Println("in common-buf-io.go func NewReader return SingleReader")
 	return &SingleReader{
 		Reader: reader,
 	}
@@ -112,6 +112,7 @@ func isPacketWriter(writer io.Writer) bool {
 
 // NewWriter creates a new Writer.
 func NewWriter(writer io.Writer) Writer {
+	fmt.Println("in common-buf-io.go func NewWriter")
 	if mw, ok := writer.(Writer); ok {
 		return mw
 	}

@@ -122,6 +122,7 @@ func (c *connection) Write(b []byte) (int, error) {
 }
 
 func (c *connection) WriteMultiBuffer(mb buf.MultiBuffer) error {
+	fmt.Println("in common-net-connection.go func (c *connection) WriteMultiBuffer")
 	if c.done.Done() {
 		buf.ReleaseMulti(mb)
 		return io.ErrClosedPipe

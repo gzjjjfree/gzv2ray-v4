@@ -18,7 +18,7 @@ var (
 const unknownProtocol = "unknown"
 
 func transportProtocolToString(protocol TransportProtocol) string {
-	fmt.Println("in transport-internet-config.go func transportProtocolToString(protocol TransportProtocol)")
+	//fmt.Println("in transport-internet-config.go func transportProtocolToString(protocol TransportProtocol)")
 	switch protocol {
 	case TransportProtocol_TCP:
 		return "tcp"
@@ -38,7 +38,7 @@ func transportProtocolToString(protocol TransportProtocol) string {
 }
 
 func RegisterProtocolConfigCreator(name string, creator ConfigCreator) error {
-	fmt.Println("in transport-internet-config.go func RegisterProtocolConfigCreator(name string, creator ConfigCreator)")
+	fmt.Println("in transport-internet-config.go func RegisterProtocolConfigCreator(name string, creator ConfigCreator): ", name)
 	if _, found := globalTransportConfigCreatorCache[name]; found {
 		return errors.New("protocol is already registered")
 	}
@@ -47,7 +47,7 @@ func RegisterProtocolConfigCreator(name string, creator ConfigCreator) error {
 }
 
 func CreateTransportConfig(name string) (interface{}, error) {
-	fmt.Println("in transport-internet-config.go func CreateTransportConfig(name string)")
+	//fmt.Println("in transport-internet-config.go func CreateTransportConfig(name string)")
 	creator, ok := globalTransportConfigCreatorCache[name]
 	if !ok {
 		return nil, errors.New("unknown transport protocol: ")
@@ -56,12 +56,12 @@ func CreateTransportConfig(name string) (interface{}, error) {
 }
 
 func (c *TransportConfig) GetTypedSettings() (interface{}, error) {
-	fmt.Println("in transport-internet-config.go func (c *TransportConfig) GetTypedSettings()")
+	//fmt.Println("in transport-internet-config.go func (c *TransportConfig) GetTypedSettings()")
 	return c.Settings.GetInstance()
 }
 
 func (c *TransportConfig) GetUnifiedProtocolName() string {
-	fmt.Println("in transport-internet-config.go func (c *TransportConfig) GetUnifiedProtocolName()")
+	//fmt.Println("in transport-internet-config.go func (c *TransportConfig) GetUnifiedProtocolName()")
 	if len(c.ProtocolName) > 0 {
 		return c.ProtocolName
 	}
@@ -70,7 +70,7 @@ func (c *TransportConfig) GetUnifiedProtocolName() string {
 }
 
 func (c *StreamConfig) GetEffectiveProtocol() string {
-	fmt.Println("in transport-internet-config.go func (c *StreamConfig) GetEffectiveProtocol()")
+	//fmt.Println("in transport-internet-config.go func (c *StreamConfig) GetEffectiveProtocol()")
 	if c == nil {
 		return "tcp"
 	}
@@ -83,13 +83,13 @@ func (c *StreamConfig) GetEffectiveProtocol() string {
 }
 
 func (c *StreamConfig) GetEffectiveTransportSettings() (interface{}, error) {
-	fmt.Println("in transport-internet-config.go func (c *StreamConfig) GetEffectiveTransportSettings()")
+	//fmt.Println("in transport-internet-config.go func (c *StreamConfig) GetEffectiveTransportSettings()")
 	protocol := c.GetEffectiveProtocol()
 	return c.GetTransportSettingsFor(protocol)
 }
 
 func (c *StreamConfig) GetTransportSettingsFor(protocol string) (interface{}, error) {
-	fmt.Println("in transport-internet-config.go func (c *StreamConfig) GetTransportSettingsFor(protocol string)")
+	//fmt.Println("in transport-internet-config.go func (c *StreamConfig) GetTransportSettingsFor(protocol string)")
 	if c != nil {
 		for _, settings := range c.TransportSettings {
 			if settings.GetUnifiedProtocolName() == protocol {
@@ -108,7 +108,7 @@ func (c *StreamConfig) GetTransportSettingsFor(protocol string) (interface{}, er
 }
 
 func (c *StreamConfig) GetEffectiveSecuritySettings() (interface{}, error) {
-	fmt.Println("in transport-internet-config.go func (c *StreamConfig) GetEffectiveSecuritySettings()")
+	//fmt.Println("in transport-internet-config.go func (c *StreamConfig) GetEffectiveSecuritySettings()")
 	for _, settings := range c.SecuritySettings {
 		if settings.Type == c.SecurityType {
 			return settings.GetInstance()
@@ -118,12 +118,12 @@ func (c *StreamConfig) GetEffectiveSecuritySettings() (interface{}, error) {
 }
 
 func (c *StreamConfig) HasSecuritySettings() bool {
-	fmt.Println("in transport-internet-config.go func (c *StreamConfig) HasSecuritySettings()")
+	//fmt.Println("in transport-internet-config.go func (c *StreamConfig) HasSecuritySettings()")
 	return len(c.SecurityType) > 0
 }
 
 func ApplyGlobalTransportSettings(settings []*TransportConfig) error {
-	fmt.Println("in transport-internet-config.go func ApplyGlobalTransportSettings(settings []*TransportConfig)")
+	//fmt.Println("in transport-internet-config.go func ApplyGlobalTransportSettings(settings []*TransportConfig)")
 	features.PrintDeprecatedFeatureWarning("global transport settings")
 	globalTransportSettings = settings
 	return nil

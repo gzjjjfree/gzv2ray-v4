@@ -5,6 +5,7 @@ package tls
 
 import (
 	"crypto/tls"
+	"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common/buf"
 	"github.com/gzjjjfree/gzv2ray-v4/common/net"
@@ -40,6 +41,7 @@ func (c *Conn) HandshakeAddress() net.Address {
 
 // Client initiates a TLS client handshake on the given connection.
 func Client(c net.Conn, config *tls.Config) net.Conn {
+	fmt.Println("in transport-internet-tls-tls.go func Client")
 	tlsConn := tls.Client(c, config)
 	return &Conn{Conn: tlsConn}
 }

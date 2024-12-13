@@ -3,6 +3,7 @@ package protocol
 import (
 	"sync"
 	"time"
+	"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common/dice"
 	"github.com/gzjjjfree/gzv2ray-v4/common/net"
@@ -99,6 +100,7 @@ func (s *ServerSpec) AddUser(user *MemoryUser) {
 }
 
 func (s *ServerSpec) PickUser() *MemoryUser {
+	fmt.Println("in common-protocol-server_spec.go func (s *ServerSpec) PickUser() Uers is: ", s.users)
 	s.RLock()
 	defer s.RUnlock()
 

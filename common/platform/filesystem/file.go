@@ -24,6 +24,7 @@ var NewFileWriter FileWriterFunc = func(path string) (io.WriteCloser, error) {
 
 func ReadFile(path string) ([]byte, error) {
 	fmt.Println("in common-platform-filesystem-file.go func ReadFile: ", path)
+	// 将路径path 的文件读入reader 中
 	reader, err := NewFileReader(path)
 	if err != nil {
 		fmt.Println("in common-platform-filesystem-file.go func ReadFile err != nil: ", err)

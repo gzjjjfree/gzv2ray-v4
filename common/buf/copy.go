@@ -4,8 +4,12 @@ import (
 	"io"
 	"time"
 	"errors"
+	"fmt"
+	"reflect"
+	//"strings"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common/signal"
+	"github.com/gzjjjfree/gzv2ray-v4/common/serial"
 )
 
 type dataHandler func(MultiBuffer)
@@ -77,8 +81,10 @@ func IsWriteError(err error) bool {
 }
 
 func copyInternal(reader Reader, writer Writer, handler *copyHandler) error {
+	fmt.Println("in common-buf-copy.go func copyInternal")
 	for {
 		buffer, err := reader.ReadMultiBuffer()
+		//fmt.Println("in common-buf-copy.go func copyInternal buffer: ")
 		if !buffer.IsEmpty() {
 			for _, handler := range handler.onData {
 				handler(buffer)
@@ -97,12 +103,15 @@ func copyInternal(reader Reader, writer Writer, handler *copyHandler) error {
 
 // Copy dumps all payload from reader to writer or stops when an error occurs. It returns nil when EOF.
 func Copy(reader Reader, writer Writer, options ...CopyOption) error {
+	fmt.Println("in common-buf-copy.go func Copy")
 	var handler copyHandler
 	for _, option := range options {
 		option(&handler)
 	}
+	fmt.Println("in common-buf-copy.go func Copy reader.type: ", reflect.TypeOf(reader))
 	err := copyInternal(reader, writer, &handler)
-	if err != nil && err != io.EOF {
+	if err != nil && serial.ToString(err) != serial.ToString(io.EOF) && serial.ToString(err)[:2] != "io" && serial.ToString(err)[:2] != "re" {
+		fmt.Println(" is in common-buf-copy.go func Copy err: ", err, " io.EOF: ", io.EOF)
 		return err
 	}
 	return nil
@@ -115,9 +124,12 @@ func CopyOnceTimeout(reader Reader, writer Writer, timeout time.Duration) error 
 	if !ok {
 		return ErrNotTimeoutReader
 	}
+
+	//fmt.Println("in common-buf-copy.go func CopyOnceTimeout() timeout: ", timeout)
 	mb, err := timeoutReader.ReadMultiBufferTimeout(timeout)
 	if err != nil {
 		return err
 	}
+	fmt.Printf("in common-buf-copy.go func CopyOnceTimeout() writer.type: %v\n", reflect.TypeOf(writer))
 	return writer.WriteMultiBuffer(mb)
 }

@@ -25,7 +25,7 @@ import (
 
 // Dial dials a WebSocket connection to the given destination.
 func Dial(ctx context.Context, dest net.Destination, streamSettings *internet.MemoryStreamConfig) (internet.Connection, error) {
-	fmt.Println("in transport-internet-websocket-clialer.go func Dial creating connection to: ", dest)
+	fmt.Println("in transport-internet-websocket-dialer.go func Dial creating connection to: ", dest)
 	newError("creating connection to ", dest).WriteToLog(session.ExportIDToError(ctx))
 
 	conn, err := dialWebsocket(ctx, dest, streamSettings)
@@ -41,7 +41,7 @@ func init() {
 }
 
 func dialWebsocket(ctx context.Context, dest net.Destination, streamSettings *internet.MemoryStreamConfig) (net.Conn, error) {
-	fmt.Println("in transport-internet-websocket-clialer.go func dialWebsocket")
+	fmt.Println("in transport-internet-websocket-dialer.go func dialWebsocket")
 	wsSettings := streamSettings.ProtocolSettings.(*Config)
 
 	dialer := &websocket.Dialer{
@@ -61,9 +61,11 @@ func dialWebsocket(ctx context.Context, dest net.Destination, streamSettings *in
 	}
 
 	host := dest.NetAddr()
+	
 	if (protocol == "ws" && dest.Port == 80) || (protocol == "wss" && dest.Port == 443) {
 		host = dest.Address.String()
 	}
+	fmt.Println("in transport-internet-websocket-dialer.go func dialWebsocket host is: ", host)
 	uri := protocol + "://" + host + wsSettings.GetNormalizedPath()
 
 	if wsSettings.UseBrowserForwarding {
@@ -95,8 +97,10 @@ func dialWebsocket(ctx context.Context, dest net.Destination, streamSettings *in
 			config:  wsSettings,
 		}), nil
 	}
-
+	// fmt.Println("in transport-internet-websocket-dialer.go func dialWebsocket dialer.Subprotocols is: ", dialer.Subprotocols)
+	// 标准库函数 dialer.Dial 根据参数发起一个 ws 连接，握手成功后返回 conn 和 resp
 	conn, resp, err := dialer.Dial(uri, wsSettings.GetRequestHeader())
+	fmt.Println("in transport-internet-websocket-dialer.go func dialWebsocket resp is: ", resp)
 	if err != nil {
 		var reason string
 		if resp != nil {
@@ -115,7 +119,7 @@ type dialerWithEarlyData struct {
 }
 
 func (d dialerWithEarlyData) Dial(earlyData []byte) (*websocket.Conn, error) {
-	fmt.Println("in transport-internet-websocket-clialer.go func (d dialerWithEarlyData) Dial")
+	fmt.Println("in transport-internet-websocket-dialer.go func (d dialerWithEarlyData) Dial")
 	earlyDataBuf := bytes.NewBuffer(nil)
 	base64EarlyDataEncoder := base64.NewEncoder(base64.RawURLEncoding, earlyDataBuf)
 
@@ -153,7 +157,7 @@ type dialerWithEarlyDataRelayed struct {
 }
 
 func (d dialerWithEarlyDataRelayed) Dial(earlyData []byte) (io.ReadWriteCloser, error) {
-	fmt.Println("in transport-internet-websocket-clialer.go func (d dialerWithEarlyDataRelayed) Dial")
+	fmt.Println("in transport-internet-websocket-dialer.go func (d dialerWithEarlyDataRelayed) Dial")
 	earlyDataBuf := bytes.NewBuffer(nil)
 	base64EarlyDataEncoder := base64.NewEncoder(base64.RawURLEncoding, earlyDataBuf)
 

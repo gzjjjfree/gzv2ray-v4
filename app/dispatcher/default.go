@@ -10,6 +10,7 @@ import (
 	"time"
 	"fmt"
 	//"errors"
+	//"example.com/gztest"
 
 	core "github.com/gzjjjfree/gzv2ray-v4"
 	"github.com/gzjjjfree/gzv2ray-v4/common"
@@ -38,7 +39,7 @@ type cachedReader struct {
 }
 
 func (r *cachedReader) Cache(b *buf.Buffer) {
-	//fmt.Println("in app-dispatcher-default.go func (r *cachedReader) Cache")
+	fmt.Println("in app-dispatcher-default.go func (r *cachedReader) Cache")
 	mb, _ := r.reader.ReadMultiBufferTimeout(time.Millisecond * 100)
 	r.Lock()
 	if !mb.IsEmpty() {
@@ -52,7 +53,7 @@ func (r *cachedReader) Cache(b *buf.Buffer) {
 }
 
 func (r *cachedReader) readInternal() buf.MultiBuffer {
-	//fmt.Println("in app-dispatcher-default.go func (r *cachedReader) readInternal()")
+	fmt.Println("in app-dispatcher-default.go func (r *cachedReader) readInternal()")
 	r.Lock()
 	defer r.Unlock()
 
@@ -66,7 +67,7 @@ func (r *cachedReader) readInternal() buf.MultiBuffer {
 }
 
 func (r *cachedReader) ReadMultiBuffer() (buf.MultiBuffer, error) {
-	//fmt.Println("in app-dispatcher-default.go func (r *cachedReader) ReadMultiBuffer()")
+	fmt.Println("in app-dispatcher-default.go func (r *cachedReader) ReadMultiBuffer()")
 	mb := r.readInternal()
 	if mb != nil {
 		return mb, nil
@@ -78,6 +79,7 @@ func (r *cachedReader) ReadMultiBuffer() (buf.MultiBuffer, error) {
 func (r *cachedReader) ReadMultiBufferTimeout(timeout time.Duration) (buf.MultiBuffer, error) {
 	fmt.Println("in app-dispatcher-default.go func (r *cachedReader) ReadMultiBufferTimeout")
 	mb := r.readInternal()
+	fmt.Println("in app-dispatcher-default.go func (r *cachedReader) ReadMultiBufferTimeout mb: ", mb)
 	if mb != nil {
 		return mb, nil
 	}
@@ -104,7 +106,7 @@ type DefaultDispatcher struct {
 }
 
 func init() {
-	fmt.Println("is run ./app/dispatcher/default.go func init ")
+	fmt.Println("in is run ./app/dispatcher/default.go func init ")
 	common.Must(common.RegisterConfig((*Config)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		d := new(DefaultDispatcher)
 		if err := core.RequireFeatures(ctx, func(om outbound.Manager, router routing.Router, pm policy.Manager, sm stats.Manager) error {
@@ -140,8 +142,10 @@ func (*DefaultDispatcher) Start() error {
 func (*DefaultDispatcher) Close() error { return nil }
 
 func (d *DefaultDispatcher) getLink(ctx context.Context) (*transport.Link, *transport.Link) {
-	fmt.Println("in app-dispatcher-default.go func (d *DefaultDispatcher) getLink")
+	
 	opt := pipe.OptionsFromContext(ctx)
+	fmt.Println("in app-dispatcher-default.go func (d *DefaultDispatcher) getLink  ")
+	//gztest.GetMessageReflectType(opt)
 	uplinkReader, uplinkWriter := pipe.New(opt...)
 	downlinkReader, downlinkWriter := pipe.New(opt...)
 
@@ -262,18 +266,18 @@ func (d *DefaultDispatcher) Dispatch(ctx context.Context, destination net.Destin
 }
 
 func sniffer(ctx context.Context, cReader *cachedReader, metadataOnly bool) (SniffResult, error) {
-	//fmt.Println("in app-dispatcher-default.go func sniffer")
+	fmt.Println("in app-dispatcher-default.go func sniffer")
 	payload := buf.New()
 	defer payload.Release()
 
 	sniffer := NewSniffer(ctx)
 
 	metaresult, metadataErr := sniffer.SniffMetadata(ctx)
-	fmt.Println("in app-dispatcher-default.go func sniffer metaresult is: ", metaresult)
+	fmt.Println("in app-dispatcher-default.go func sniffer metaresult is: ", metaresult, " err: ", metadataErr)
 	if metadataOnly {
 		return metaresult, metadataErr
 	}
-	fmt.Println("in app-dispatcher-default.go func sniffer 不会执行")
+	//fmt.Println("in app-dispatcher-default.go func sniffer 不会执行")
 	contentResult, contentErr := func() (SniffResult, error) {
 		totalAttempt := 0
 		for {
@@ -289,6 +293,7 @@ func sniffer(ctx context.Context, cReader *cachedReader, metadataOnly bool) (Sni
 				cReader.Cache(payload)
 				if !payload.IsEmpty() {
 					result, err := sniffer.Sniff(ctx, payload.Bytes())
+					//fmt.Println("in app-dispatcher-default.go func sniffer result is: ", result.Domain(), result.Protocol())
 					if err != common.ErrNoClue {
 						return result, err
 					}
@@ -330,6 +335,7 @@ func (d *DefaultDispatcher) routedDispatch(ctx context.Context, link *transport.
 			fmt.Println("in app-dispatcher-default.go func (d *DefaultDispatcher) routedDispatch Tag is: ", tag)
 			if h := d.ohm.GetHandler(tag); h != nil {
 				newError("taking detour [", tag, "] for [", destination, "]")
+				//fmt.Printf("taking detour [", tag, "] for [", destination, "]")
 				handler = h
 			} else {
 				newError("non existing tag: ", tag).AtWarning()

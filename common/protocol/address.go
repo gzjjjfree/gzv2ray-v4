@@ -3,6 +3,7 @@ package protocol
 import (
 	"io"
 	"errors"
+	"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common"
 	"github.com/gzjjjfree/gzv2ray-v4/common/buf"
@@ -53,6 +54,7 @@ type option struct {
 
 // NewAddressParser creates a new AddressParser
 func NewAddressParser(options ...AddressOption) AddressSerializer {
+	fmt.Println("in common-protocol-address.go func NewAddressParser")
 	var o option
 	for i := range o.addrByteMap {
 		o.addrByteMap[i] = afInvalid
@@ -85,6 +87,7 @@ type portFirstAddressParser struct {
 }
 
 func (p portFirstAddressParser) ReadAddressPort(buffer *buf.Buffer, input io.Reader) (net.Address, net.Port, error) {
+	fmt.Println("in common-protocal-address.go func (p portFirstAddressParser) ReadAddressPort")
 	if buffer == nil {
 		buffer = buf.New()
 		defer buffer.Release()
@@ -115,6 +118,7 @@ type portLastAddressParser struct {
 }
 
 func (p portLastAddressParser) ReadAddressPort(buffer *buf.Buffer, input io.Reader) (net.Address, net.Port, error) {
+	fmt.Println("in common-protocal-address.go func (p portLastAddressParser) ReadAddressPort")
 	if buffer == nil {
 		buffer = buf.New()
 		defer buffer.Release()

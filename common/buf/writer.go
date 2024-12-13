@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common"
+	"github.com/gzjjjfree/gzv2ray-v4/common/serial"
 )
 
 // BufferToBytesWriter is a Writer that writes alloc.Buffer into underlying writer.
@@ -19,6 +20,7 @@ type BufferToBytesWriter struct {
 
 // WriteMultiBuffer implements Writer. This method takes ownership of the given buffer.
 func (w *BufferToBytesWriter) WriteMultiBuffer(mb MultiBuffer) error {
+	fmt.Println("in common-buf-writer.go func (w *BufferToBytesWriter) WriteMultiBuffer")
 	defer ReleaseMulti(mb)
 
 	size := mb.Len()
@@ -126,6 +128,7 @@ func (w *BufferedWriter) Write(b []byte) (int, error) {
 
 // WriteMultiBuffer implements Writer. It takes ownership of the given MultiBuffer.
 func (w *BufferedWriter) WriteMultiBuffer(b MultiBuffer) error {
+	fmt.Println("in common-buf-writer.go func (w *BufferedWriter) WriteMultiBuffer")
 	if b.IsEmpty() {
 		return nil
 	}
@@ -221,6 +224,7 @@ type SequentialWriter struct {
 
 // WriteMultiBuffer implements Writer.
 func (w *SequentialWriter) WriteMultiBuffer(mb MultiBuffer) error {
+	fmt.Println("in common-buf-writer.go func (w *SequentialWriter) WriteMultiBuffer")
 	mb, err := WriteMultiBuffer(w.Writer, mb)
 	ReleaseMulti(mb)
 	return err
@@ -229,6 +233,7 @@ func (w *SequentialWriter) WriteMultiBuffer(mb MultiBuffer) error {
 type noOpWriter byte
 
 func (noOpWriter) WriteMultiBuffer(b MultiBuffer) error {
+	fmt.Println("in common-buf-writer.go func (noOpWriter) WriteMultiBuffer")
 	ReleaseMulti(b)
 	return nil
 }
@@ -247,7 +252,7 @@ func (noOpWriter) ReadFrom(reader io.Reader) (int64, error) {
 		_, err := b.ReadFrom(reader)
 		totalBytes += int64(b.Len())
 		if err != nil {
-			if err == io.EOF {
+			if serial.ToString(err) == serial.ToString(io.EOF) {
 				return totalBytes, nil
 			}
 			return totalBytes, err

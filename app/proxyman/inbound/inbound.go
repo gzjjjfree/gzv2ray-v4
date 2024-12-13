@@ -86,12 +86,14 @@ func (m *Manager) Start() error {
 	m.running = true
 
 	for _, handler := range m.taggedHandlers {
+		fmt.Println("in app-proxyman-inbound-inbound.go func Start() range m.taggedHandlers")
 		if err := handler.Start(); err != nil {
 			return err
 		}
 	}
 
 	for _, handler := range m.untaggedHandler {
+		fmt.Println("in app-proxyman-inbound-inbound.go func Start() range m.untaggedHandler")
 		if err := handler.Start(); err != nil {
 			return err
 		}
@@ -138,6 +140,7 @@ func New(ctx context.Context, config *proxyman.InboundConfig) (*Manager, error) 
 // NewHandler creates a new inbound.Handler based on the given config.
 // NewHandler 根据给定的配置创建一个新的 inbound.Handler。
 func NewHandler(ctx context.Context, config *core.InboundHandlerConfig) (inbound.Handler, error) {
+	fmt.Println("in app-proxyman-inbound-inbound.go func NewHandler")
 	rawReceiverSettings, err := config.ReceiverSettings.GetInstance()
 	if err != nil {
 		return nil, err
@@ -155,6 +158,7 @@ func NewHandler(ctx context.Context, config *core.InboundHandlerConfig) (inbound
 
 	streamSettings := receiverSettings.StreamSettings
 	if streamSettings != nil && streamSettings.SocketSettings != nil {
+		fmt.Println("in app-proxyman-inbound-inbound.go func NewHandler streamSettings.SocketSettings != nil")
 		ctx = session.ContextWithSockopt(ctx, &session.Sockopt{
 			Mark: streamSettings.SocketSettings.Mark,
 		})
@@ -179,7 +183,7 @@ func (*Manager) Type() interface{} {
 
 
 func init() {
-	fmt.Println("is run ./app/proxyman/inbound/inbound.go func init ")
+	fmt.Println("in is run ./app/proxyman/inbound/inbound.go func init ")
 	common.Must(common.RegisterConfig((*proxyman.InboundConfig)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		return New(ctx, config.(*proxyman.InboundConfig))
 	}))

@@ -4,6 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/md5"
 	"hash"
+	//"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common"
 	"github.com/gzjjjfree/gzv2ray-v4/common/uuid"
@@ -48,11 +49,13 @@ func (id ID) CmdKey() []byte {
 
 // NewID returns an ID with given UUID.
 func NewID(uuid uuid.UUID) *ID {
+	//fmt.Println("in common-protocol-id.go func NewID uuid: ", uuid)
 	id := &ID{uuid: uuid}
 	md5hash := md5.New()
 	common.Must2(md5hash.Write(uuid.Bytes()))
 	common.Must2(md5hash.Write([]byte("c48619fe-8f02-49e0-b9e9-edf763e17e21")))
 	md5hash.Sum(id.cmdKey[:0])
+	//fmt.Println("in common-protocol-id.go func NewID id: ", id)
 	return id
 }
 

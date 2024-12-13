@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
+	//"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common"
 )
@@ -64,6 +65,7 @@ func ParseBytes(b []byte) (UUID, error) {
 
 // ParseString converts a UUID in string form to object.
 func ParseString(str string) (UUID, error) {
+	//fmt.Println("in common-uuid-uuid.go func ParseString")
 	var uuid UUID
 
 	text := []byte(str)
@@ -78,10 +80,11 @@ func ParseString(str string) (UUID, error) {
 			text = text[1:]
 		}
 
+		// 将十六进制解码为十进制字节
 		if _, err := hex.Decode(b[:byteGroup/2], text[:byteGroup]); err != nil {
 			return uuid, err
 		}
-
+		//fmt.Println("in common-uuid-uuid.go func ParseString b: ", b[:byteGroup/2], " t: ", text[:byteGroup])
 		text = text[byteGroup:]
 		b = b[byteGroup/2:]
 	}

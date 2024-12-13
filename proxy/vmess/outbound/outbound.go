@@ -7,8 +7,9 @@ package outbound
 
 import (
 	"context"
-	"time"
 	"fmt"
+	//"reflect"
+	"time"
 
 	core "github.com/gzjjjfree/gzv2ray-v4"
 	"github.com/gzjjjfree/gzv2ray-v4/common"
@@ -61,7 +62,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	fmt.Println("in proxy-vmess-outbound-outbound.go func (h *Handler) Process")
 	var rec *protocol.ServerSpec
 	var conn internet.Connection
-
+	
 	err := retry.ExponentialBackoff(5, 200).On(func() error {
 		//fmt.Println("in proxy-vmess-outbound-outbound.go func (h *Handler) Process retry.ExponentialBackoff")
 		rec = h.serverPicker.PickServer()
@@ -110,6 +111,8 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	account := request.User.Account.(*vmess.MemoryAccount)
 	request.Security = account.Security
 
+	fmt.Println("in proxy-vmess-outbound-outbound.go func (h *Handler) Process request is: ", request)
+
 	if request.Security == protocol.SecurityType_AES128_GCM || request.Security == protocol.SecurityType_NONE || request.Security == protocol.SecurityType_CHACHA20_POLY1305 {
 		request.Option.Set(protocol.RequestOptionChunkMasking)
 	}
@@ -125,6 +128,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	}
 
 	input := link.Reader
+	
 	output := link.Writer
 
 	isAEAD := false
@@ -145,7 +149,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		if err := session.EncodeRequestHeader(request, writer); err != nil {
 			return newError("failed to encode request").Base(err).AtWarning()
 		}
-
+		//fmt.Println("in proxy-vmess-outbound-outbound.go func (h *Handler) Process before buf.Copy input: ")
 		bodyWriter := session.EncodeRequestBody(request, writer)
 		if err := buf.CopyOnceTimeout(input, bodyWriter, time.Millisecond*100); err != nil && err != buf.ErrNotTimeoutReader && err != buf.ErrReadTimeout {
 			return newError("failed to write first payload").Base(err)
@@ -154,16 +158,19 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		if err := writer.SetBuffered(false); err != nil {
 			return err
 		}
-
+		fmt.Println("in proxy-vmess-outbound-outbound.go func (h *Handler) Process before buf.Copy")
 		if err := buf.Copy(input, bodyWriter, buf.UpdateActivity(timer)); err != nil {
 			return err
 		}
-
+		fmt.Println("in proxy-vmess-outbound-outbound.go func (h *Handler) Process before request.Option.Has")
 		if request.Option.Has(protocol.RequestOptionChunkStream) {
+			fmt.Println("in proxy-vmess-outbound-outbound.go func (h *Handler) Process before bodyWriter.WriteMultiBuffer")
 			if err := bodyWriter.WriteMultiBuffer(buf.MultiBuffer{}); err != nil {
+				fmt.Println("in proxy-vmess-outbound-outbound.go func (h *Handler) Process before bodyWriter.WriteMultiBuffer err")
 				return err
 			}
 		}
+		fmt.Println("in proxy-vmess-outbound-outbound.go func (h *Handler) Process return nil")
 
 		return nil
 	}
@@ -172,6 +179,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		defer timer.SetTimeout(sessionPolicy.Timeouts.UplinkOnly)
 
 		reader := &buf.BufferedReader{Reader: buf.NewReader(conn)}
+		fmt.Printf("in proxy-vmess-outbound-outbound.go func (*Handler) Process reader:%T\n", reader.Reader)
 		header, err := session.DecodeResponseHeader(reader)
 		if err != nil {
 			return newError("failed to read header").Base(err)

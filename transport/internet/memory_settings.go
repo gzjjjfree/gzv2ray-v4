@@ -12,6 +12,7 @@ type MemoryStreamConfig struct {
 }
 
 // ToMemoryStreamConfig converts a StreamConfig to MemoryStreamConfig. It returns a default non-nil MemoryStreamConfig for nil input.
+// ToMemoryStreamConfig 将 StreamConfig 转换为 MemoryStreamConfig。它为 nil 输入返回默认的非 nil MemoryStreamConfig。
 func ToMemoryStreamConfig(s *StreamConfig) (*MemoryStreamConfig, error) {
 	fmt.Println("in transport-internet-memory_settings.go func ToMemoryStreamConfig(s *StreamConfig)")
 	ets, err := s.GetEffectiveTransportSettings()

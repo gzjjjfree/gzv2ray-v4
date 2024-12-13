@@ -24,6 +24,7 @@ const exp8357 = "experiment:8357"
 
 // ParseCertificate converts a cert.Certificate to Certificate.
 func ParseCertificate(c *cert.Certificate) *Certificate {
+	fmt.Println("in transport-internet-tls-config.go func ParseCertificate")
 	if c != nil {
 		certPEM, keyPEM := c.ToPEM()
 		return &Certificate{
@@ -35,6 +36,7 @@ func ParseCertificate(c *cert.Certificate) *Certificate {
 }
 
 func (c *Config) loadSelfCertPool() (*x509.CertPool, error) {
+	fmt.Println("in transport-internet-tls-config.go func (c *Config) loadSelfCertPool()")
 	root := x509.NewCertPool()
 	for _, cert := range c.Certificate {
 		if !root.AppendCertsFromPEM(cert.Certificate) {
@@ -46,6 +48,7 @@ func (c *Config) loadSelfCertPool() (*x509.CertPool, error) {
 
 // BuildCertificates builds a list of TLS certificates from proto definition.
 func (c *Config) BuildCertificates() []tls.Certificate {
+	fmt.Println("in transport-internet-tls-config.go func (c *Config) BuildCertificates()")
 	certs := make([]tls.Certificate, 0, len(c.Certificate))
 	for _, entry := range c.Certificate {
 		if entry.Usage != Certificate_ENCIPHERMENT {
@@ -62,6 +65,7 @@ func (c *Config) BuildCertificates() []tls.Certificate {
 }
 
 func isCertificateExpired(c *tls.Certificate) bool {
+	fmt.Println("in transport-internet-tls-config.go func isCertificateExpired")
 	if c.Leaf == nil && len(c.Certificate) > 0 {
 		if pc, err := x509.ParseCertificate(c.Certificate[0]); err == nil {
 			c.Leaf = pc
@@ -73,6 +77,7 @@ func isCertificateExpired(c *tls.Certificate) bool {
 }
 
 func issueCertificate(rawCA *Certificate, domain string) (*tls.Certificate, error) {
+	fmt.Println("in transport-internet-tls-config.go func issueCertificate")
 	parent, err := cert.ParseCertificate(rawCA.Certificate, rawCA.Key)
 	if err != nil {
 		return nil, errors.New("failed to parse raw certificate")
@@ -97,6 +102,7 @@ func (c *Config) getCustomCA() []*Certificate {
 }
 
 func getGetCertificateFunc(c *tls.Config, ca []*Certificate) func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
+	fmt.Println("in transport-internet-tls-config.go func getGetCertificateFunc")
 	var access sync.RWMutex
 
 	return func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
@@ -174,6 +180,7 @@ func (c *Config) parseServerName() string {
 
 // GetTLSConfig converts this Config into tls.Config.
 func (c *Config) GetTLSConfig(opts ...Option) *tls.Config {
+	fmt.Println("in transport-internet-tls-config.go func (*Config).GetTLSConfig")
 	root, err := c.getCertPool()
 	if err != nil {
 		fmt.Println("failed to load system root certificate")
@@ -210,6 +217,7 @@ func (c *Config) GetTLSConfig(opts ...Option) *tls.Config {
 	}
 
 	if sn := c.parseServerName(); len(sn) > 0 {
+		fmt.Println("in transport-internet-tls-config.go func (*Config).GetTLSConfig config.ServerName is: ", sn)
 		config.ServerName = sn
 	}
 

@@ -15,13 +15,13 @@ import (
 	_ "github.com/gzjjjfree/gzv2ray-v4/app/stats/command"
 
 	// Other optional features.
-	//_ "github.com/gzjjjfree/gzv2ray-v4/app/dns"
+	_ "github.com/gzjjjfree/gzv2ray-v4/app/dns"
 	//_ "github.com/gzjjjfree/gzv2ray-v4/app/dns/fakedns"
 	_ "github.com/gzjjjfree/gzv2ray-v4/app/log"
 	_ "github.com/gzjjjfree/gzv2ray-v4/app/policy"
 	_ "github.com/gzjjjfree/gzv2ray-v4/app/reverse"
 	_ "github.com/gzjjjfree/gzv2ray-v4/app/router"
-	_ "github.com/gzjjjfree/gzv2ray-v4/app/stats"
+	//_ "github.com/gzjjjfree/gzv2ray-v4/app/stats"
 
 	// Fix dependency cycle caused by core import in internet package
 	_ "github.com/gzjjjfree/gzv2ray-v4/transport/internet/tagged/taggedimpl"
@@ -29,13 +29,13 @@ import (
 	// Inbound and outbound proxies.
 	_ "github.com/gzjjjfree/gzv2ray-v4/proxy/blackhole"
 	_ "github.com/gzjjjfree/gzv2ray-v4/proxy/dns"
-	_ "github.com/gzjjjfree/gzv2ray-v4/proxy/dokodemo"
+	//_ "github.com/gzjjjfree/gzv2ray-v4/proxy/dokodemo"
 	_ "github.com/gzjjjfree/gzv2ray-v4/proxy/freedom"
 	_ "github.com/gzjjjfree/gzv2ray-v4/proxy/http"
-	_ "github.com/gzjjjfree/gzv2ray-v4/proxy/mtproto"
-	_ "github.com/gzjjjfree/gzv2ray-v4/proxy/shadowsocks"
+	//_ "github.com/gzjjjfree/gzv2ray-v4/proxy/mtproto"
+	//_ "github.com/gzjjjfree/gzv2ray-v4/proxy/shadowsocks"
 	_ "github.com/gzjjjfree/gzv2ray-v4/proxy/socks"
-	_ "github.com/gzjjjfree/gzv2ray-v4/proxy/trojan"
+	//_ "github.com/gzjjjfree/gzv2ray-v4/proxy/trojan"
 	//_ "github.com/gzjjjfree/gzv2ray-v4/proxy/vless/inbound"
 	//_ "github.com/gzjjjfree/gzv2ray-v4/proxy/vless/outbound"
 	_ "github.com/gzjjjfree/gzv2ray-v4/proxy/vmess/inbound"
@@ -45,7 +45,7 @@ import (
 	_ "github.com/gzjjjfree/gzv2ray-v4/transport/internet/domainsocket"
 	_ "github.com/gzjjjfree/gzv2ray-v4/transport/internet/grpc"
 	_ "github.com/gzjjjfree/gzv2ray-v4/transport/internet/http"
-	_ "github.com/gzjjjfree/gzv2ray-v4/transport/internet/kcp"
+	//_ "github.com/gzjjjfree/gzv2ray-v4/transport/internet/kcp"
 	_ "github.com/gzjjjfree/gzv2ray-v4/transport/internet/quic"
 	_ "github.com/gzjjjfree/gzv2ray-v4/transport/internet/tcp"
 	_ "github.com/gzjjjfree/gzv2ray-v4/transport/internet/tls"

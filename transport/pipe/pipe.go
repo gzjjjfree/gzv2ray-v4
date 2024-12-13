@@ -2,6 +2,7 @@ package pipe
 
 import (
 	"context"
+	//"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common/signal"
 	"github.com/gzjjjfree/gzv2ray-v4/common/signal/done"
@@ -38,8 +39,10 @@ func OptionsFromContext(ctx context.Context) []Option {
 
 	bp := policy.BufferPolicyFromContext(ctx)
 	if bp.PerConnection >= 0 {
+		//fmt.Println("in transport-pipe-pipe.go func OptionsFromContext bp.PerConnection >= 0")
 		opt = append(opt, WithSizeLimit(bp.PerConnection))
 	} else {
+		//fmt.Println("in transport-pipe-pipe.go func OptionsFromContext bp.PerConnection !>= 0")
 		opt = append(opt, WithoutSizeLimit())
 	}
 

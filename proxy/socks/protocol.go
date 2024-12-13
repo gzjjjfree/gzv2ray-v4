@@ -7,6 +7,7 @@ import (
 	"encoding/binary"
 	"io"
 	"fmt"
+	//"bytes"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common"
 	"github.com/gzjjjfree/gzv2ray-v4/common/buf"
@@ -160,6 +161,7 @@ func (s *ServerSession) handshake5(nMethod byte, reader io.Reader, writer io.Wri
 			return nil, newError("failed to read request").Base(err)
 		}
 		cmd = buffer.Byte(1)
+		//fmt.Println("in proxy-socks-protocol.go func (s *ServerSession) handshake5 buffer.Byte(1): ", buffer.Byte(1))
 		buffer.Release()
 	}
 
@@ -190,16 +192,17 @@ func (s *ServerSession) handshake5(nMethod byte, reader io.Reader, writer io.Wri
 	}
 
 	request.Version = socks5Version
-
+	
 	addr, port, err := addrParser.ReadAddressPort(nil, reader)
 	if err != nil {
 		return nil, newError("failed to read address").Base(err)
 	}
 	request.Address = addr
 	request.Port = port
-
+	fmt.Println("in  handshake5 addr: ", addr, "port: ", port)
 	responseAddress := s.address
 	responsePort := s.port
+	fmt.Println("in  handshake5 responseAddress: ", responseAddress, "responsePort: ", responsePort)
 	//nolint:gocritic // Use if else chain for clarity
 	if request.Command == protocol.RequestCommandUDP {
 		
@@ -238,7 +241,7 @@ func (s *ServerSession) Handshake(reader io.Reader, writer io.Writer) (*protocol
 	version := buffer.Byte(0)
 	cmd := buffer.Byte(1)
 	buffer.Release()
-
+	fmt.Println("in proxy-socks-protocol.go func (s *ServerSession) Handshake cmd: ", cmd, " int32(cmd): ", int32(cmd))
 	switch version {
 	case socks4Version:
 		return s.handshake4(cmd, reader, writer)

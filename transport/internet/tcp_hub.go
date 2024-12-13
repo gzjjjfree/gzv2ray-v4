@@ -61,7 +61,7 @@ func ListenTCP(ctx context.Context, address net.Address, port net.Port, settings
 		}
 		settings = s
 	}
-	fmt.Println("in ttansport-internet-tcp_hub.go func ListenTCP settings != nil")
+	//fmt.Println("in ttansport-internet-tcp_hub.go func ListenTCP settings != nil")
 	if address.Family().IsDomain() && address.Domain() == "localhost" {
 		fmt.Println("in ttansport-internet-tcp_hub.go func ListenTCP address = net.LocalHostIP")
 		address = net.LocalHostIP
@@ -72,6 +72,8 @@ func ListenTCP(ctx context.Context, address net.Address, port net.Port, settings
 	}
 
 	protocol := settings.ProtocolName
+	fmt.Println("in ttansport-internet-tcp_hub.go func ListenTCP ProtocolName: ", protocol)
+	// 转入 protocol 注册的函数 ListenTCP
 	listenFunc := transportListenerCache[protocol]
 	if listenFunc == nil {
 		return nil, errors.New(" listener not registered")

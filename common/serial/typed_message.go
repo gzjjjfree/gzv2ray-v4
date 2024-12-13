@@ -93,9 +93,11 @@ func ToTypedMessage(message proto.Message) *TypedMessage {
 		fmt.Println("in common-serial-typed_message.go func ToTypeMMessage() message == nil ")
 		return nil
 	}
+	// 将结构体序列化为字节
 	settings, _ := proto.Marshal(message)
 	//fmt.Println("in common-serial-typed_message.go func ToTypeMMessage() settings: ", string(settings))
 	//fmt.Println("in common-serial-typed_message.go func ToTypeMMessage() Type:: ", ProtoMessageToString(message))
+	// type 为 protomessage 格式的名称
 	return &TypedMessage{
 		Type:  ProtoMessageToString(message),
 		Value: settings,

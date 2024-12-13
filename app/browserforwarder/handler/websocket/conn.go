@@ -9,7 +9,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"io"
-	"io/ioutil"
+	//"io/ioutil"
 	"math/rand"
 	"net"
 	"strconv"
@@ -17,6 +17,8 @@ import (
 	"time"
 	"unicode/utf8"
 	"fmt"
+
+	"github.com/gzjjjfree/gzv2ray-v4/common/serial"
 )
 
 const (
@@ -370,7 +372,7 @@ func (c *Conn) writeFatal(err error) error {
 
 func (c *Conn) read(n int) ([]byte, error) {
 	p, err := c.br.Peek(n)
-	if err == io.EOF {
+	if serial.ToString(err) == serial.ToString(io.EOF) {
 		err = errUnexpectedEOF
 	}
 	c.br.Discard(len(p))
@@ -710,7 +712,7 @@ func (w *messageWriter) ReadFrom(r io.Reader) (nn int64, err error) {
 		w.pos += n
 		nn += int64(n)
 		if err != nil {
-			if err == io.EOF {
+			if serial.ToString(err) == serial.ToString(io.EOF) {
 				err = nil
 			}
 			break
@@ -791,7 +793,7 @@ func (c *Conn) advanceFrame() (int, error) {
 	// 1. Skip remainder of previous frame.
 
 	if c.readRemaining > 0 {
-		if _, err := io.CopyN(ioutil.Discard, c.br, c.readRemaining); err != nil {
+		if _, err := io.CopyN(io.Discard, c.br, c.readRemaining); err != nil {
 			return noFrame, err
 		}
 	}
@@ -1029,7 +1031,7 @@ func (r *messageReader) Read(b []byte) (int, error) {
 			rem := c.readRemaining
 			rem -= int64(n)
 			c.setReadRemaining(rem)
-			if c.readRemaining > 0 && c.readErr == io.EOF {
+			if c.readRemaining > 0 && serial.ToString(c.readErr) == serial.ToString(io.EOF) {
 				c.readErr = errUnexpectedEOF
 			}
 			return n, c.readErr
@@ -1050,7 +1052,7 @@ func (r *messageReader) Read(b []byte) (int, error) {
 	}
 
 	err := c.readErr
-	if err == io.EOF && c.messageReader == r {
+	if serial.ToString(err) == serial.ToString(io.EOF) && c.messageReader == r {
 		err = errUnexpectedEOF
 	}
 	return 0, err
@@ -1069,7 +1071,7 @@ func (c *Conn) ReadMessage() (messageType int, p []byte, err error) {
 	if err != nil {
 		return messageType, nil, err
 	}
-	p, err = ioutil.ReadAll(r)
+	p, err = io.ReadAll(r)
 	return messageType, p, err
 }
 

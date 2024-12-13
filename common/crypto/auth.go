@@ -10,6 +10,7 @@ import (
 	"github.com/gzjjjfree/gzv2ray-v4/common/buf"
 	"github.com/gzjjjfree/gzv2ray-v4/common/bytespool"
 	"github.com/gzjjjfree/gzv2ray-v4/common/protocol"
+	"github.com/gzjjjfree/gzv2ray-v4/common/serial"
 )
 
 type BytesGenerator func() []byte
@@ -209,7 +210,7 @@ func (r *AuthenticationReader) ReadMultiBuffer() (buf.MultiBuffer, error) {
 
 	for i := 1; i < readSize; i++ {
 		err := r.readInternal(true, &mb)
-		if err == errSoft || err == io.EOF {
+		if err == errSoft || serial.ToString(err) == serial.ToString(io.EOF) {
 			break
 		}
 		if err != nil {

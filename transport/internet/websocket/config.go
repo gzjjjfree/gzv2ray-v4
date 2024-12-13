@@ -5,6 +5,7 @@ package websocket
 
 import (
 	"net/http"
+	"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common"
 	"github.com/gzjjjfree/gzv2ray-v4/transport/internet"
@@ -13,6 +14,7 @@ import (
 const protocolName = "websocket"
 
 func (c *Config) GetNormalizedPath() string {
+	fmt.Println("in transport-internet-websocket config.go func (c *Config) GetNormalizedPath()")
 	path := c.Path
 	if path == "" {
 		return "/"

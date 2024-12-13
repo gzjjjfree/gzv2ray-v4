@@ -101,7 +101,7 @@ func NewForwarder(ctx context.Context, cfg *Config) *Forwarder {
 }
 
 func init() {
-	fmt.Println("is run ./app/browserforwarder/forwarder.go func init ")
+	fmt.Println("in is run ./app/browserforwarder/forwarder.go func init ")
 	common.Must(common.RegisterConfig((*Config)(nil), func(ctx context.Context, cfg interface{}) (interface{}, error) {
 		return NewForwarder(ctx, cfg.(*Config)), nil
 	}))

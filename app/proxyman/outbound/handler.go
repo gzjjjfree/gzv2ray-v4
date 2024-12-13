@@ -137,6 +137,7 @@ func (h *Handler) Tag() string {
 // Dispatch implements proxy.Outbound.Dispatch.
 func (h *Handler) Dispatch(ctx context.Context, link *transport.Link) {
 	fmt.Println("in app-proxymann-outbound-handler.go func (h *Handler) Dispatch")
+	
 	if h.mux != nil && (h.mux.Enabled || session.MuxPreferedFromContext(ctx)) {
 		if err := h.mux.Dispatch(ctx, link); err != nil {
 			fmt.Println("failed to process mux outbound traffic")
@@ -145,7 +146,7 @@ func (h *Handler) Dispatch(ctx context.Context, link *transport.Link) {
 	} else {
 		if err := h.proxy.Process(ctx, link, h); err != nil {
 			// Ensure outbound ray is properly closed.
-			fmt.Println("failed to process outbound traffic")
+			fmt.Println("failed to process outbound traffic err: ", err)
 			common.Interrupt(link.Writer)
 		} else {
 			common.Must(common.Close(link.Writer))

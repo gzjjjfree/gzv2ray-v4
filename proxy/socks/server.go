@@ -5,10 +5,11 @@ package socks
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"time"
-	"fmt"
 
+	//"example.com/gztest"
 	core "github.com/gzjjjfree/gzv2ray-v4"
 	"github.com/gzjjjfree/gzv2ray-v4/common"
 	"github.com/gzjjjfree/gzv2ray-v4/common/buf"
@@ -53,7 +54,8 @@ func (s *Server) policy() policy.Session {
 	if config.Timeout > 0 && config.UserLevel == 0 {
 		p.Timeouts.ConnectionIdle = time.Duration(config.Timeout) * time.Second
 	}
-	fmt.Println("P is: ", p)
+	//fmt.Println("P is: ")
+	//gztest.GetMessageReflectType(p)
 	return p
 }
 
@@ -69,7 +71,7 @@ func (s *Server) Network() []net.Network {
 
 // Process implements proxy.Inbound.
 func (s *Server) Process(ctx context.Context, network net.Network, conn internet.Connection, dispatcher routing.Dispatcher) error {
-	fmt.Println("in proxy-socks-serrverr.go func (s *Server) Process")
+	fmt.Println("in proxy-socks-serrverr.go func (s *Server) Process ctx: ", ctx)
 	if inbound := session.InboundFromContext(ctx); inbound != nil {
 		inbound.User = &protocol.MemoryUser{
 			Level: s.config.UserLevel,
@@ -130,6 +132,7 @@ func (s *Server) processTCP(ctx context.Context, conn internet.Connection, dispa
 	if request.Command == protocol.RequestCommandTCP {
 		fmt.Println("in proxy-socks-server.go func processTCP request.Command == protocol.RequestCommandTCP")
 		dest := request.Destination()
+		fmt.Printf("TCP Connect in ID: %v request to %v\n", session.IDFromContext(ctx), dest)
 		newError("TCP Connect request to ", dest).WriteToLog(session.ExportIDToError(ctx))
 		if inbound != nil && inbound.Source.IsValid() {
 			fmt.Println("in proxy-socks-server.go func processTCP protocol.RequestCommandTCP inbound != nil && inbound.Source.IsValid()")

@@ -94,6 +94,7 @@ func (c *Content) SetAttribute(name string, value string) {
 }
 
 // Attribute retrieves additional string attributes from content.
+// 属性从内容中检索附加字符串属性。
 func (c *Content) Attribute(name string) string {
 	fmt.Println("in common-session-session.go func (c *Content) Attribute: ", c.Attributes[name])
 	if c.Attributes == nil {

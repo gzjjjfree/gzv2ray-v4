@@ -8,6 +8,8 @@ import (
 	"os"
 	"strings"
 
+	//"example.com/gztest" //gztest.GetMessageReflectType(appSettings)
+
 	core "github.com/gzjjjfree/gzv2ray-v4"
 	"github.com/gzjjjfree/gzv2ray-v4/app/dispatcher"
 	"github.com/gzjjjfree/gzv2ray-v4/app/proxyman"
@@ -537,6 +539,7 @@ func (c *Config) Build() (*core.Config, error) {
 	fmt.Println("in infa-conf-v2ray.go func (c *Config) Build() 路由设置")
 	// 路由设置
 	if c.RouterConfig != nil {
+		//gztest.GetMessageReflectType(*c.RouterConfig)
 		routerConfig, err := c.RouterConfig.Build()
 		if err != nil {
 			return nil, err
@@ -659,5 +662,6 @@ func (c *Config) Build() (*core.Config, error) {
 		config.Outbound = append(config.Outbound, oc)
 	}
 	// config 设置了 APP 及 inbounds 和 outbounds 字段
+	fmt.Println("in infa-conf-v2ray.go func (c *Config) Build() return")
 	return config, nil
 }

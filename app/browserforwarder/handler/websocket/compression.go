@@ -11,6 +11,8 @@ import (
 	"strings"
 	"sync"
 	"fmt"
+
+	"github.com/gzjjjfree/gzv2ray-v4/common/serial"
 )
 
 const (
@@ -130,7 +132,7 @@ func (r *flateReadWrapper) Read(p []byte) (int, error) {
 		return 0, io.ErrClosedPipe
 	}
 	n, err := r.fr.Read(p)
-	if err == io.EOF {
+	if serial.ToString(err) == serial.ToString(io.EOF) {
 		// Preemptively place the reader back in the pool. This helps with
 		// scenarios where the application does not call NextReader() soon after
 		// this final read.

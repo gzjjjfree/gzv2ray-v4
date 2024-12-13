@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"strings"
+	"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common"
 	"github.com/gzjjjfree/gzv2ray-v4/common/net"
@@ -57,6 +58,7 @@ func beginWithHTTPMethod(b []byte) error {
 }
 
 func SniffHTTP(b []byte) (*SniffHeader, error) {
+	fmt.Println("in common-protocol-http-sniff.go func SnifHTTP")
 	if err := beginWithHTTPMethod(b); err != nil {
 		return nil, err
 	}

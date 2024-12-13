@@ -20,6 +20,7 @@ import (
 	"github.com/gzjjjfree/gzv2ray-v4/features/dns"
 	"github.com/gzjjjfree/gzv2ray-v4/transport"
 	"github.com/gzjjjfree/gzv2ray-v4/transport/internet"
+	"github.com/gzjjjfree/gzv2ray-v4/common/serial"
 )
 
 func init() {
@@ -169,7 +170,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, d internet.
 
 		for {
 			b, err := reader.ReadMessage()
-			if err == io.EOF {
+			if serial.ToString(err) == serial.ToString(io.EOF) {
 				return nil
 			}
 
@@ -194,7 +195,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, d internet.
 	response := func() error {
 		for {
 			b, err := connReader.ReadMessage()
-			if err == io.EOF {
+			if serial.ToString(err) == serial.ToString(io.EOF) {
 				return nil
 			}
 

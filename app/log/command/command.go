@@ -49,7 +49,7 @@ func (s *service) Register(server *grpc.Server) {
 }
 
 func init() {
-	fmt.Println("is run ./app/log/command/command.go func init ")
+	fmt.Println("in is run ./app/log/command/command.go func init ")
 	common.Must(common.RegisterConfig((*Config)(nil), func(ctx context.Context, cfg interface{}) (interface{}, error) {
 		s := core.MustFromContext(ctx)
 		return &service{v: s}, nil

@@ -2,10 +2,10 @@ package conf
 
 import (
 	"encoding/json"
-	"strconv"
-	"strings"
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
 
 	"google.golang.org/protobuf/proto"
 
@@ -72,18 +72,22 @@ func (c *RouterConfig) getDomainStrategy() router.Config_DomainStrategy {
 func (c *RouterConfig) Build() (*router.Config, error) {
 	fmt.Println("in infra-conf-router.go func  (c *RouterConfig) Build()")
 	config := new(router.Config)
+	// 取得路由模式
 	config.DomainStrategy = c.getDomainStrategy()
 
 	var rawRuleList []json.RawMessage
 	if c != nil {
 		rawRuleList = c.RuleList
 		if c.Settings != nil {
+			fmt.Println("in infra-conf-router.go func  (c *RouterConfig) Build() c.Settings != nil")
+			// config.jjson 的 routing-settings 字段不为空时，将值加入路由列表
 			c.RuleList = append(c.RuleList, c.Settings.RuleList...)
 			rawRuleList = c.RuleList
 		}
 	}
 
 	for _, rawRule := range rawRuleList {
+		// 解析每一个路由, rule = paresfieldRule 结构体
 		rule, err := ParseRule(rawRule)
 		if err != nil {
 			return nil, err
@@ -93,8 +97,10 @@ func (c *RouterConfig) Build() (*router.Config, error) {
 			rule.DomainMatcher = c.DomainMatcher
 		}
 
+		//汇总每个路由
 		config.Rule = append(config.Rule, rule)
 	}
+	// balancers 字段是一个数组，每个元素代表一种负载均衡算法
 	for _, rawBalancer := range c.Balancers {
 		balancer, err := rawBalancer.Build()
 		if err != nil {
@@ -189,18 +195,21 @@ func loadIP(filename, country string) ([]*router.CIDR, error) {
 
 func loadSite(filename, list string) ([]*router.Domain, error) {
 	fmt.Println("in infra-conf-router.go func loadSite: ", filename)
+	// 将文件读入 geositeBytes
 	geositeBytes, err := filesystem.ReadAsset(filename)
 	if err != nil {
 		fmt.Println("in infra-conf-router.go func loadSite err != nil")
 		return nil, errors.New("failed to open file")
 	}
 	var geositeList router.GeoSiteList
+	// 将字节反序列化为结构体 geositeList
 	if err := proto.Unmarshal(geositeBytes, &geositeList); err != nil {
 		fmt.Println("in infra-conf-router.go func loadSite proto.Unmarshal err")
 		return nil, err
 	}
 	//fmt.Println("in infra-conf-router.go func loadSite range geositeList.Entry")
 	for _, site := range geositeList.Entry {
+		// 根据条目返回Domain
 		if strings.EqualFold(site.CountryCode, list) {
 			//fmt.Println("in infra-conf-router.go func loadSite: ", filename)
 			//return nil, errors.New("list not found in")
@@ -264,10 +273,13 @@ func loadGeosite(list string) ([]*router.Domain, error) {
 
 func loadGeositeWithAttr(file string, siteWithAttr string) ([]*router.Domain, error) {
 	fmt.Println("in infra-conf-router.go func loadGeositeWithAttr")
+	// 将一个字符串 siteWithAttr 根据 @ 符号进行分割
 	parts := strings.Split(siteWithAttr, "@")
 	if len(parts) == 0 {
 		return nil, errors.New("empty rule")
 	}
+	fmt.Println("in infra-conf-router.go func loadGeositeWithAttr parts: ", parts)
+	// TrimSpace 返回字符串 s 的切片，其中所有前导和尾随空格均被删除，如 Unicode 所定义。
 	list := strings.TrimSpace(parts[0])
 	attrVal := parts[1:]
 
@@ -275,13 +287,16 @@ func loadGeositeWithAttr(file string, siteWithAttr string) ([]*router.Domain, er
 		return nil, errors.New("empty listname in rule")
 	}
 
+	// 读取文件，赋值给 domains
 	domains, err := loadSite(file, list)
 	if err != nil {
 		return nil, err
 	}
 
 	attrs := parseAttrs(attrVal)
+	fmt.Println("in infra-conf-router.go func loadGeositeWithAttr attrs: ", attrs)
 	if attrs.IsEmpty() {
+		fmt.Println("in infra-conf-router.go func loadGeositeWithAttr attrs.IsEmpty() ")
 		if strings.Contains(siteWithAttr, "@") {
 			errors.New("empty attribute list")
 		}
@@ -289,9 +304,11 @@ func loadGeositeWithAttr(file string, siteWithAttr string) ([]*router.Domain, er
 	}
 
 	filteredDomains := make([]*router.Domain, 0, len(domains))
+	fmt.Println("in infra-conf-router.go func loadGeositeWithAttr filteredDomains: ", filteredDomains)
 	hasAttrMatched := false
 	for _, domain := range domains {
 		if attrs.Match(domain) {
+			fmt.Println("in infra-conf-router.go func loadGeositeWithAttr attrs.Match(domain): ", attrs.Match(domain))
 			hasAttrMatched = true
 			filteredDomains = append(filteredDomains, domain)
 		}
@@ -305,11 +322,14 @@ func loadGeositeWithAttr(file string, siteWithAttr string) ([]*router.Domain, er
 
 func parseDomainRule(domain string) ([]*router.Domain, error) {
 	fmt.Println("in infra-conf-router.go func parseDomainRule")
+	// HasPrefix 报告字符串 s 是否以前缀开头。
 	if strings.HasPrefix(domain, "geosite:") {
 		list := domain[8:]
+		// 取: 后的值，空报错
 		if len(list) == 0 {
 			return nil, errors.New("empty listname in rule")
 		}
+		// domains 为读取到文件的 []*router.Domain 列表
 		domains, err := loadGeosite(list)
 		if err != nil {
 			return nil, errors.New("failed to load geosite")
@@ -503,6 +523,7 @@ func parseFieldRule(msg json.RawMessage) (*router.RoutingRule, error) {
 		Attributes string       `json:"attrs"`
 	}
 	rawFieldRule := new(RawFieldRule)
+	// 将单个路由设置解析为 RawFieldRule 结构体
 	err := json.Unmarshal(msg, rawFieldRule)
 	if err != nil {
 		return nil, err
@@ -600,13 +621,17 @@ func parseFieldRule(msg json.RawMessage) (*router.RoutingRule, error) {
 }
 
 func ParseRule(msg json.RawMessage) (*router.RoutingRule, error) {
-	fmt.Println("in infra-conf-router.go func ParseRule")
+	fmt.Printf("in infra-conf-router.go func ParseRule msg: %s\n", msg)
 	rawRule := new(RouterRule)
+	// 将每个路由字段解析为结构体 RouterrRule,这次解析只为了取得type来判断？
 	err := json.Unmarshal(msg, rawRule)
 	if err != nil {
 		return nil, errors.New("invalid router rule")
 	}
+	//fmt.Printf("in infra-conf-router.go func ParseRule msg2: %s\n", msg)
+	// 路由字段的 type 必须为 field
 	if strings.EqualFold(rawRule.Type, "field") {
+		// type 正确时，
 		fieldrule, err := parseFieldRule(msg)
 		if err != nil {
 			return nil, errors.New("invalid field rule")

@@ -15,6 +15,7 @@ func (DefaultManager) Type() interface{} {
 
 // ForLevel implements Manager.
 func (DefaultManager) ForLevel(level uint32) Session {
+	//fmt.Println("in features-policy-default.go func (DefaultManager) ForLevel")
 	p := SessionDefault()
 	if level == 1 {
 		p.Timeouts.ConnectionIdle = time.Second * 600

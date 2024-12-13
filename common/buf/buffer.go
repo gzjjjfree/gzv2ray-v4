@@ -29,22 +29,8 @@ type Buffer struct {
 // New creates a Buffer with 0 length and 2K capacity.
 func New() *Buffer {
 	//fmt.Println("in common-buf-bufffer.go func New")
-	data := pool.Get()	
-	switch v := data.(type) {
-	case []byte:
-		//fmt.Println("type is: []byte")
-		r := &Buffer{
-			v: v,
-		}
-		return r
-	case *[]byte:
-		//fmt.Println("type is: *[]byte")
-		r := &Buffer{
-			v: *v,
-		}
-		return r
-	default:
-		panic("unexpected type from pool")
+	return &Buffer{
+		v: pool.Get().([]byte),
 	}
 }
 
@@ -52,26 +38,13 @@ func New() *Buffer {
 // This method is for buffers that is released in the same function.
 func StackNew() Buffer {
 	fmt.Println("in common-buf-bufffer.go func StackNew()")
-	data := pool.Get()	
-	switch v := data.(type) {
-	case []byte:
-		//fmt.Println("type is: []byte")
-		r := Buffer{
-			v: v,
-		}
-		return r
-	case *[]byte:
-		//fmt.Println("type is: *[]byte")
-		r := Buffer{
-			v: *v,
-		}
-		return r
-	default:
-		panic("unexpected type from pool")
+	return Buffer{
+		v: pool.Get().([]byte),
 	}
 }
 
 // Release recycles the buffer into an internal buffer pool.
+// Release 将缓冲区回收到内部缓冲池中
 func (b *Buffer) Release() {
 	if b == nil || b.v == nil {
 		return
@@ -80,7 +53,7 @@ func (b *Buffer) Release() {
 	p := b.v
 	b.v = nil
 	b.Clear()
-	pool.Put(&p) // nolint: staticcheck
+	pool.Put(p) // nolint: staticcheck
 }
 
 // Clear clears the content of the buffer, results an empty buffer with
@@ -230,6 +203,7 @@ func (b *Buffer) ReadFrom(reader io.Reader) (int64, error) {
 
 // ReadFullFrom reads exact size of bytes from given reader, or until error occurs.
 func (b *Buffer) ReadFullFrom(reader io.Reader, size int32) (int64, error) {
+	//fmt.Println("in common-buf-buffer.go func (b *Buffer) ReadFullFrom b.end: ", b.end, " size: ", size)
 	end := b.end + size
 	if end > int32(len(b.v)) {
 		//v := end

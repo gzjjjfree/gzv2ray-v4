@@ -35,6 +35,7 @@ func (u *User) ToMemoryUser() (*MemoryUser, error) {
 }
 
 // MemoryUser is a parsed form of User, to reduce number of parsing of Account proto.
+// MemoryUser 是 User 的解析形式，以减少 Account 协议的解析次数
 type MemoryUser struct {
 	// Account is the parsed account of the protocol.
 	Account Account

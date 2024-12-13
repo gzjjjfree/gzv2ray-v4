@@ -100,7 +100,7 @@ func ReadFrom(reader io.Reader) (MultiBuffer, error) {
 		}
 
 		if err != nil {
-			if err == io.EOF || err == io.ErrUnexpectedEOF {
+			if serial.ToString(err) == serial.ToString(io.EOF) || err == io.ErrUnexpectedEOF {
 				fmt.Println("in common-buf-multi_buffer.go func ReadFrom The errors返回根本错误原因: ", err)
 				return mb, nil
 			}
@@ -230,7 +230,7 @@ func SplitSize(mb MultiBuffer, size int32) (MultiBuffer, MultiBuffer) {
 
 // WriteMultiBuffer writes all buffers from the MultiBuffer to the Writer one by one, and return error if any, with leftover MultiBuffer.
 func WriteMultiBuffer(writer io.Writer, mb MultiBuffer) (MultiBuffer, error) {
-//	fmt.Println("in common-buf-multi_butffer.go func WriteMultiBuffer")
+	fmt.Println("in common-buf-multi_butffer.go func WriteMultiBuffer")
 	for {
 		mb2, b := SplitFirst(mb)
 		mb = mb2
@@ -275,7 +275,7 @@ func (mb MultiBuffer) IsEmpty() bool {
 
 // String returns the content of the MultiBuffer in string.
 func (mb MultiBuffer) String() string {
-	fmt.Println("in common-buf-multi_butffer.go func (mb MultiBuffer) String()")
+	//fmt.Println("in common-buf-multi_butffer.go func (mb MultiBuffer) String()")
 	v := make([]interface{}, len(mb))
 	for i, b := range mb {
 		v[i] = b

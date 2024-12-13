@@ -128,7 +128,7 @@ func (fkdns *Holder) GetDomainFromFakeDNS(ip net.Address) string {
 }
 
 func init() {
-	fmt.Println("is run ./app/dns/fakedns/fake.go func init ")
+	fmt.Println("in is run ./app/dns/fakedns/fake.go func init ")
 	common.Must(common.RegisterConfig((*FakeDnsPool)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		var f *Holder
 		var err error

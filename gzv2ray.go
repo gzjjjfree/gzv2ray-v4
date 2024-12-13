@@ -10,7 +10,7 @@ import (
 	"reflect"
 	"sync"
 
-	"example.com/gztest"
+	"example.com/gztest" //gztest.GetMessageReflectType(appSettings)
 
 	"github.com/gzjjjfree/gzv2ray-v4/common"
 	"github.com/gzjjjfree/gzv2ray-v4/features"
@@ -67,9 +67,7 @@ func New(config *Config) (*Instance, error) {
 	fmt.Println("in gzv2ray.go func New")
 	var server = &Instance{ctx: context.Background()} // Instance 实例 结合了 V2Ray 中的所有功能
 	// Background 返回一个非零的空 [Context]。它永远不会被取消，没有值，也没有截止期限。它通常由主函数、初始化和测试使用，并作为传入请求的顶级 Context。
-if server.featureResolutions == nil {
-	fmt.Println("in gzv2ray.go func New server.featureResolutions == nil")
-}
+
 	done, err := initInstanceWithConfig(config, server) // 函数参数为 配置文件和一个空的 Context，返回一个布尔值和错误
 	if done {                                           // config 配置不正确时，done 为真，返回空及错误
 		fmt.Println("in gzv2ray.go New err is: ", err)
@@ -233,12 +231,13 @@ func (s *Instance) AddFeature(feature features.Feature) error {
 }
 
 func (r *resolution) resolve(allFeatures []features.Feature) (bool, error) { // resoleve 解析接口
-	//fmt.Println("in gzv2ray.go func (r *resolution) resolve")
-	//gztest.GetMessageReflectType(r.deps)
+	fmt.Println("in gzv2ray.go func (r *resolution) resolve")
+	gztest.GetMessageReflectType(r.deps)
 	var fs []features.Feature
 	// r 是  Feature 类型列表及回调函数
 	for _, d := range r.deps {
 		// 在功能中查找 deps 类型匹配
+		//fmt.Println("in gzv2ray.go func (r *resolution) resolve d: ", d)
 		f := getFeature(allFeatures, d)
 		// 找到最后的参数类型 *stats.Manager 后，f 才会 != nill 才会执行后面的代码
 		if f == nil { // 当无匹配时，返回
@@ -255,9 +254,14 @@ func (r *resolution) resolve(allFeatures []features.Feature) (bool, error) { // 
 	var input []reflect.Value
 	// 需要 Feature 类型的列表
 	callbackType := callback.Type() 
+	//fmt.Println("in gzv2ray.go func (r *resolution) resolve callbackType: ", callbackType)
 	for i := 0; i < callbackType.NumIn(); i++ { // NumIn 返回函数类型的输入参数数量。如果类型的 Kind 不是 Func，则会引起混乱。
 		pt := callbackType.In(i) // In 返回函数类型的第 i 个输入参数的类型。如果类型的 Kind 不是 Func，则会引起混乱。如果 i 不在 [0, NumIn()) 范围内，则会引起混乱。
 		for _, f := range fs {
+			//fmt.Println("in gzv2ray.go func (r *resolution) resolve pt: ", pt)
+			//fmt.Println("in gzv2ray.go func (r *resolution) resolve reflect.TypeOf(f): ", reflect.TypeOf(f))
+			//fmt.Printf("%T\n", f)
+			//fmt.Printf("%T\n", pt)
 			//fmt.Println("in gzv2ray.go func (r *resolution) resolve f := range fs i: ", i, " ", reflect.TypeOf(f.Type()))
 			// 判定已注册的需求功能是否能赋值给回调函数当参数
 			if reflect.TypeOf(f).AssignableTo(pt) { // AssignableTo 报告该类型的值是否可以分配给类型 u
@@ -297,7 +301,7 @@ func (s *Instance) GetFeature(featureType interface{}) features.Feature {
 func getFeature(allFeatures []features.Feature, t reflect.Type) features.Feature {
 	//fmt.Println("in gzv2ray.go func getFeature(allFeatures []features.Feature, t reflect.Type) t: ", reflect.ValueOf(t))
 	for _, f := range allFeatures {
-		//fmt.Println("in gzv2ray.go func getFeature(allFeatures []features.Feature, t reflect.Type)  range allFeatures: ", reflect.TypeOf(f.Type()))
+		//fmt.Println("in gzv2ray.go func getFeature(allFeatures []features.Feature, t reflect.Type)  range allFeatures: ", reflect.TypeOf(f))
 		if reflect.TypeOf(f.Type()) == t {
 			//fmt.Println("in gzv2ray.go func getFeature(allFeatures []features.Feature, t reflect.Type) reflect.TypeOf(f.Type()) == t")
 			return f
@@ -360,6 +364,7 @@ func (s *Instance) RequireFeatures(callback interface{}) error {
 	}
 
 	var featureTypes []reflect.Type
+	//fmt.Println("in gzv2ray.go (s *Instance) RequireFeatures featureTypes: ", callbackType)
 	// featureTypes 汇总回调函数各个参数 feature 的指针
 	for i := 0; i < callbackType.NumIn(); i++ {
 		featureTypes = append(featureTypes, reflect.PointerTo(callbackType.In(i)))
@@ -371,10 +376,11 @@ func (s *Instance) RequireFeatures(callback interface{}) error {
 	}
 	
 	if finished, err := r.resolve(s.features); finished {
+		//fmt.Println("in gzv2ray.go (s *Instance) RequireFeatures err ")
 		return err
 	}
-	fmt.Println("in gzv2ray.go (s *Instance) RequireFeatures r ")
-	gztest.GetMessageReflectType(r.deps)
+	//fmt.Println("in gzv2ray.go (s *Instance) RequireFeatures r.deps: ", r.deps)
+	//gztest.GetMessageReflectType(r.deps)
 	// 把没有注册的依赖功能类型列表 r.deps 添加到实例 featureResolutions 中
 	s.featureResolutions = append(s.featureResolutions, r)
 	return nil

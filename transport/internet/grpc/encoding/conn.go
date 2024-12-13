@@ -11,6 +11,7 @@ import (
 	"fmt"
 
 	"google.golang.org/grpc/peer"
+	"github.com/gzjjjfree/gzv2ray-v4/common/serial"
 )
 
 // GunService is the abstract interface of GunService_TunClient and GunService_TunServer
@@ -39,7 +40,7 @@ func (c *GunConn) Read(b []byte) (n int, err error) {
 		c.reader = bytes.NewReader(h.Data)
 	}
 	n, err = c.reader.Read(b)
-	if err == io.EOF {
+	if serial.ToString(err) == serial.ToString(io.EOF) {
 		c.reader = nil
 		return n, nil
 	}

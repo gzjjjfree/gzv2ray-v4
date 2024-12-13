@@ -311,7 +311,7 @@ func (s *DNS) sortClients(domain string) []*Client {
 }
 
 func init() {
-	fmt.Println("is run ./app/dns/dns.go func init ")
+	fmt.Println("in is run ./app/dns/dns.go func init ")
 	common.Must(common.RegisterConfig((*Config)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		return New(ctx, config.(*Config))
 	}))

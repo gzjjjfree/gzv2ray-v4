@@ -15,6 +15,7 @@ import (
 )
 
 // newFakeDNSSniffer Create a Fake DNS metadata sniffer
+// newFakeDNSSniffer 创建虚假 DNS 元数据嗅探器
 func newFakeDNSSniffer(ctx context.Context) (protocolSnifferWithMetadata, error) {
 	fmt.Println("in app-dispatcher-fackednssniffer.go func newFakeDNSSniffer")
 	var fakeDNSEngine dns.FakeDNSEngine
@@ -37,6 +38,7 @@ func newFakeDNSSniffer(ctx context.Context) (protocolSnifferWithMetadata, error)
 				return &fakeDNSSniffResult{domainName: domainFromFakeDNS}, nil
 			}
 		}
+		fmt.Println("in app-dispatcher-fackednssniffer.go func newFakeDNSSniffer return nil, common.ErrNoClue")
 		return nil, common.ErrNoClue
 	}, metadataSniffer: true}, nil
 }

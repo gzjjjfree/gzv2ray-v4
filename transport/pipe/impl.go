@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"sync"
 	"time"
-	"fmt"
+	//"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common"
 	"github.com/gzjjjfree/gzv2ray-v4/common/buf"
@@ -45,6 +45,7 @@ var errBufferFull = errors.New("buffer full")
 var errSlowDown = errors.New("slow down")
 
 func (p *pipe) getState(forRead bool) error {
+	//fmt.Println("in transport-pipe-impl.go func (p *pipe) getState")
 	switch p.state {
 	case open:
 		if !forRead && p.option.isFull(p.data.Len()) {
@@ -67,6 +68,7 @@ func (p *pipe) getState(forRead bool) error {
 }
 
 func (p *pipe) readMultiBufferInternal() (buf.MultiBuffer, error) {
+	//fmt.Println("in transport-pipe-impl.go func (p *pipe) readMultiBufferInternal()")
 	p.Lock()
 	defer p.Unlock()
 
@@ -80,30 +82,41 @@ func (p *pipe) readMultiBufferInternal() (buf.MultiBuffer, error) {
 }
 
 func (p *pipe) ReadMultiBuffer() (buf.MultiBuffer, error) {
+	//fmt.Println("in transport-pipe-impl.go func (p *pipe) ReadMultiBuffer()")
 	for {
 		data, err := p.readMultiBufferInternal()
+		
 		if data != nil || err != nil {
+			 
+			//fmt.Println("in transport-pipe-impl.go func (p *pipe) ReadMultiBuffer() data != nil")
+
 			p.writeSignal.Signal()
 			return data, err
 		}
-
+		//fmt.Println("in transport-pipe-impl.go func (p *pipe) ReadMultiBuffer() wait data")
 		select {
-		case <-p.readSignal.Wait():
-		case <-p.done.Wait():
+		case <-p.readSignal.Wait()://fmt.Println("in transport-pipe-impl.go func (p *pipe) ReadMultiBuffer() wait data <-p.readSignal.Wait()")
+		case <-p.done.Wait()://fmt.Println("in transport-pipe-impl.go func (p *pipe) ReadMultiBuffer() wait data <-p.done.Wait()")
 		}
 	}
 }
 
 func (p *pipe) ReadMultiBufferTimeout(d time.Duration) (buf.MultiBuffer, error) {
+	//fmt.Println("in transport-pipe-impl.go func (p *pipe) ReadMultiBufferTimeout")
 	timer := time.NewTimer(d)
 	defer timer.Stop()
 
 	for {
 		data, err := p.readMultiBufferInternal()
+		//fmt.Println("in transport-pipe-impl.go func (p *pipe) ReadMultiBufferTimeout data: ")
 		if data != nil || err != nil {
+			
+			 
+			//fmt.Println("in transport-pipe-impl.go func (p *pipe) ReadMultiBufferTimeout data != nil")
+
 			p.writeSignal.Signal()
-			return data, err
-		}
+		    return data, err
+		    }
 
 		select {
 		case <-p.readSignal.Wait():
@@ -115,6 +128,7 @@ func (p *pipe) ReadMultiBufferTimeout(d time.Duration) (buf.MultiBuffer, error) 
 }
 
 func (p *pipe) writeMultiBufferInternal(mb buf.MultiBuffer) error {
+	//fmt.Println("in transport-pipe-impl.go func (p *pipe) writeMultiBufferInternal")
 	p.Lock()
 	defer p.Unlock()
 
@@ -132,6 +146,7 @@ func (p *pipe) writeMultiBufferInternal(mb buf.MultiBuffer) error {
 }
 
 func (p *pipe) WriteMultiBuffer(mb buf.MultiBuffer) error {
+	//fmt.Println("in transport-pipe-impl.go func (p *pipe) WriteMultiBuffer")
 	if mb.IsEmpty() {
 		return nil
 	}
@@ -171,7 +186,7 @@ func (p *pipe) WriteMultiBuffer(mb buf.MultiBuffer) error {
 }
 
 func (p *pipe) Close() error {
-	fmt.Println("in transport-pipe-impl.go func (p *pipe) Close()")
+	//fmt.Println("in transport-pipe-impl.go func (p *pipe) Close()")
 	p.Lock()
 	defer p.Unlock()
 

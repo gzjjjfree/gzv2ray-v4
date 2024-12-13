@@ -139,7 +139,7 @@ func (g *Instance) Close() error {
 }
 
 func init() {
-	fmt.Println("is run ./app/log/log.go func init ")
+	fmt.Println("in is run ./app/log/log.go func init ")
 	common.Must(common.RegisterConfig((*Config)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		return New(ctx, config.(*Config))
 	}))

@@ -108,7 +108,7 @@ func (c *Commander) Close() error {
 }
 
 func init() {
-	fmt.Println("is run ./app/commander/commander.go func init ")
+	fmt.Println("in is run ./app/commander/commander.go func init ")
 	common.Must(common.RegisterConfig((*Config)(nil), func(ctx context.Context, cfg interface{}) (interface{}, error) {
 		return NewCommander(ctx, cfg.(*Config))
 	}))

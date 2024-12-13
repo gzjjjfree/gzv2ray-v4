@@ -45,7 +45,7 @@ func getControlFunc(ctx context.Context, sockopt *SocketConfig, controllers []co
 }
 
 func (dl *DefaultListener) Listen(ctx context.Context, addr net.Addr, sockopt *SocketConfig) (net.Listener, error) {
-	fmt.Println("in transport-internet-system_listener.go func (dl *DefaultListener) Listen")
+	fmt.Println("in transport-internet-system_listener.go func (dl *DefaultListener) Listen addr.String(): ", addr.String())
 	var lc net.ListenConfig
 	var l net.Listener
 	var err error
@@ -81,7 +81,9 @@ func (dl *DefaultListener) Listen(ctx context.Context, addr net.Addr, sockopt *S
 	}
 
 	l, err = lc.Listen(ctx, network, address)
+	fmt.Println("in transport-internet-system_listener.go func (dl *DefaultListener) Listen\n使用 net.ListenConfig 的方法 Listen 监听")
 	if sockopt != nil && sockopt.AcceptProxyProtocol {
+		fmt.Println("in transport-internet-system_listener.go func (dl *DefaultListener) Listensockopt != nil")
 		policyFunc := func(upstream net.Addr) (proxyproto.Policy, error) { return proxyproto.REQUIRE, nil }
 		l = &proxyproto.Listener{Listener: l, Policy: policyFunc}
 	}

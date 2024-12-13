@@ -12,6 +12,7 @@ import (
 	"hash"
 	"hash/fnv"
 	"io"
+	"fmt"
 
 	"golang.org/x/crypto/chacha20poly1305"
 
@@ -48,6 +49,7 @@ type ClientSession struct {
 
 // NewClientSession creates a new ClientSession.
 func NewClientSession(ctx context.Context, isAEAD bool, idHash protocol.IDHash) *ClientSession {
+	fmt.Println("in proxy-vmess-encoding-client.go func NewClientSession")
 	session := &ClientSession{
 		isAEAD: isAEAD,
 		idHash: idHash,
@@ -73,6 +75,7 @@ func NewClientSession(ctx context.Context, isAEAD bool, idHash protocol.IDHash) 
 }
 
 func (c *ClientSession) EncodeRequestHeader(header *protocol.RequestHeader, writer io.Writer) error {
+	fmt.Println("in proxy-vmess-encoding-client.go func (c *ClientSession) EncodeRequestHeader")
 	timestamp := protocol.NewTimestampGenerator(protocol.NowTime(), 30)()
 	account := header.User.Account.(*vmess.MemoryAccount)
 	if !c.isAEAD {
@@ -127,6 +130,7 @@ func (c *ClientSession) EncodeRequestHeader(header *protocol.RequestHeader, writ
 }
 
 func (c *ClientSession) EncodeRequestBody(request *protocol.RequestHeader, writer io.Writer) buf.Writer {
+	fmt.Println("in proxy-vmess-encoding-client.go func (c *ClientSession) EncodeRequestBody")
 	var sizeParser crypto.ChunkSizeEncoder = crypto.PlainChunkSizeParser{}
 	if request.Option.Has(protocol.RequestOptionChunkMasking) {
 		sizeParser = NewShakeSizeParser(c.requestBodyIV[:])
@@ -188,12 +192,15 @@ func (c *ClientSession) EncodeRequestBody(request *protocol.RequestHeader, write
 }
 
 func (c *ClientSession) DecodeResponseHeader(reader io.Reader) (*protocol.ResponseHeader, error) {
+	fmt.Println("in proxy-vmess-encoding-client.go func (c *ClientSession) DecodeResponseHeader")
 	if !c.isAEAD {
 		aesStream := crypto.NewAesDecryptionStream(c.responseBodyKey[:], c.responseBodyIV[:])
 		c.responseReader = crypto.NewCryptionReader(aesStream, reader)
 	} else {
 		aeadResponseHeaderLengthEncryptionKey := vmessaead.KDF16(c.responseBodyKey[:], vmessaead.KDFSaltConstAEADRespHeaderLenKey)
+		fmt.Println("in func DecodeResponseHeader aeadResponseHeaderLengthEncryptionKey is: ", aeadResponseHeaderLengthEncryptionKey)
 		aeadResponseHeaderLengthEncryptionIV := vmessaead.KDF(c.responseBodyIV[:], vmessaead.KDFSaltConstAEADRespHeaderLenIV)[:12]
+		fmt.Println("in func DecodeResponseHeader aeadResponseHeaderLengthEncryptionIV is: ", aeadResponseHeaderLengthEncryptionIV)
 
 		aeadResponseHeaderLengthEncryptionKeyAESBlock := common.Must2(aes.NewCipher(aeadResponseHeaderLengthEncryptionKey)).(cipher.Block)
 		aeadResponseHeaderLengthEncryptionAEAD := common.Must2(cipher.NewGCM(aeadResponseHeaderLengthEncryptionKeyAESBlock)).(cipher.AEAD)
@@ -202,16 +209,19 @@ func (c *ClientSession) DecodeResponseHeader(reader io.Reader) (*protocol.Respon
 		var decryptedResponseHeaderLength int
 		var decryptedResponseHeaderLengthBinaryDeserializeBuffer uint16
 
+		fmt.Println("in proxy-vmess-encoding-client.go func (c *ClientSession) DecodeResponseHeader before io.ReadFull")
 		if _, err := io.ReadFull(reader, aeadEncryptedResponseHeaderLength[:]); err != nil {
 			return nil, newError("Unable to Read Header Len").Base(err)
 		}
+		fmt.Println("in proxy-vmess-encoding-client.go func (c *ClientSession) DecodeResponseHeader after io.ReadFull")
 		if decryptedResponseHeaderLengthBinaryBuffer, err := aeadResponseHeaderLengthEncryptionAEAD.Open(nil, aeadResponseHeaderLengthEncryptionIV, aeadEncryptedResponseHeaderLength[:], nil); err != nil {
+			
 			return nil, newError("Failed To Decrypt Length").Base(err)
 		} else { // nolint: golint
 			common.Must(binary.Read(bytes.NewReader(decryptedResponseHeaderLengthBinaryBuffer), binary.BigEndian, &decryptedResponseHeaderLengthBinaryDeserializeBuffer))
 			decryptedResponseHeaderLength = int(decryptedResponseHeaderLengthBinaryDeserializeBuffer)
 		}
-
+		fmt.Println("in func DecodeResponseHeader decryptedResponseHeaderLength is: ", decryptedResponseHeaderLength)
 		aeadResponseHeaderPayloadEncryptionKey := vmessaead.KDF16(c.responseBodyKey[:], vmessaead.KDFSaltConstAEADRespHeaderPayloadKey)
 		aeadResponseHeaderPayloadEncryptionIV := vmessaead.KDF(c.responseBodyIV[:], vmessaead.KDFSaltConstAEADRespHeaderPayloadIV)[:12]
 
@@ -229,6 +239,7 @@ func (c *ClientSession) DecodeResponseHeader(reader io.Reader) (*protocol.Respon
 		} else { // nolint: golint
 			c.responseReader = bytes.NewReader(decryptedResponseHeaderBuffer)
 		}
+		fmt.Println("in func DecodeResponseHeader c.responseReader is: ", c.responseReader)
 	}
 
 	buffer := buf.StackNew()
@@ -267,6 +278,7 @@ func (c *ClientSession) DecodeResponseHeader(reader io.Reader) (*protocol.Respon
 }
 
 func (c *ClientSession) DecodeResponseBody(request *protocol.RequestHeader, reader io.Reader) buf.Reader {
+	fmt.Println("in proxy-vmess-encoding-client.go func (c *ClientSession) DecodeResponseBody")
 	var sizeParser crypto.ChunkSizeDecoder = crypto.PlainChunkSizeParser{}
 	if request.Option.Has(protocol.RequestOptionChunkMasking) {
 		sizeParser = NewShakeSizeParser(c.responseBodyIV[:])

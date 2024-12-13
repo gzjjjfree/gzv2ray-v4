@@ -4,7 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	//"reflect"
+	"example.com/gztest"
 
+	//"example.com/gztest"
 	core "github.com/gzjjjfree/gzv2ray-v4"
 	"github.com/gzjjjfree/gzv2ray-v4/app/proxyman"
 	"github.com/gzjjjfree/gzv2ray-v4/common"
@@ -51,6 +54,7 @@ type AlwaysOnInboundHandler struct {
 }
 
 func NewAlwaysOnInboundHandler(ctx context.Context, tag string, receiverConfig *proxyman.ReceiverConfig, proxyConfig interface{}) (*AlwaysOnInboundHandler, error) {
+	fmt.Println("in app-proxyman-inbound-always.go func NewAlwaysOnInboundHandler ctx: ", ctx)
 	rawProxy, err := common.CreateObject(ctx, proxyConfig)
 	if err != nil {
 		return nil, err
@@ -65,7 +69,9 @@ func NewAlwaysOnInboundHandler(ctx context.Context, tag string, receiverConfig *
 		mux:   mux.NewServer(ctx),
 		tag:   tag,
 	}
-
+	//fmt.Println("the mux.NewServer type is: %T", reflect.TypeOf(h.mux))
+	//fmt.Println("the mux.NewServer type is: %T", h.mux)
+	gztest.GetMessageReflectType(*h.mux)
 	uplinkCounter, downlinkCounter := getStatCounter(core.MustFromContext(ctx), tag)
 
 	nl := p.Network()

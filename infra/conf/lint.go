@@ -1,6 +1,9 @@
 package conf
 
-import "errors"
+import (
+	"fmt"
+	"errors"
+)
 
 type ConfigureFilePostProcessingStage interface {
 	Process(conf *Config) error
@@ -9,6 +12,7 @@ type ConfigureFilePostProcessingStage interface {
 var configureFilePostProcessingStages map[string]ConfigureFilePostProcessingStage
 
 func RegisterConfigureFilePostProcessingStage(name string, stage ConfigureFilePostProcessingStage) {
+	fmt.Println("in infra-conf-lint.go func RegisterConfigureFilePostProcessingStage name: ", name)
 	if configureFilePostProcessingStages == nil {
 		configureFilePostProcessingStages = make(map[string]ConfigureFilePostProcessingStage)
 	}
