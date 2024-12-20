@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"strings"
 	"errors"
+	//"fmt"
 
 	"google.golang.org/protobuf/proto"
 
@@ -126,6 +127,7 @@ type VMessOutboundConfig struct {
 
 // Build implements Buildable
 func (c *VMessOutboundConfig) Build() (proto.Message, error) {
+	//fmt.Println("in infra-conf-vmess.go func (c *VMessOutboundConfig) Build()")
 	config := new(outbound.Config)
 
 	if len(c.Receivers) == 0 {

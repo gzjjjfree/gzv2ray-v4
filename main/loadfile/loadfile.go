@@ -16,6 +16,8 @@ var f embed.FS
 //go:embed geoip.dat
 var d embed.FS
 
+
+
 func Loadfile(filename string, f embed.FS) error {
 
 	data, err := f.ReadFile(filename)

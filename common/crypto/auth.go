@@ -5,6 +5,7 @@ import (
 	"io"
 	"math/rand"
 	"errors"
+	"fmt"
 
 	"github.com/gzjjjfree/gzv2ray-v4/common"
 	"github.com/gzjjjfree/gzv2ray-v4/common/buf"
@@ -231,6 +232,7 @@ type AuthenticationWriter struct {
 }
 
 func NewAuthenticationWriter(auth Authenticator, sizeParser ChunkSizeEncoder, writer io.Writer, transferType protocol.TransferType, padding PaddingLengthGenerator) *AuthenticationWriter {
+	
 	w := &AuthenticationWriter{
 		auth:         auth,
 		writer:       buf.NewWriter(writer),
@@ -341,6 +343,7 @@ func (w *AuthenticationWriter) writePacket(mb buf.MultiBuffer) error {
 
 // WriteMultiBuffer implements buf.Writer.
 func (w *AuthenticationWriter) WriteMultiBuffer(mb buf.MultiBuffer) error {
+	fmt.Println("in common-crypto-auth.go func (w *AuthenticationWriter) WriteMultiBuffer")
 	if mb.IsEmpty() {
 		eb, err := w.seal([]byte{})
 		common.Must(err)

@@ -22,6 +22,7 @@ type Conn struct {
 }
 
 func (c *Conn) WriteMultiBuffer(mb buf.MultiBuffer) error {
+	//fmt.Println("in transport-internet-tls-tls.go func (c *Conn) WriteMultiBuffer")
 	mb = buf.Compact(mb)
 	mb, err := buf.WriteMultiBuffer(c, mb)
 	buf.ReleaseMulti(mb)

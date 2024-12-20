@@ -105,7 +105,7 @@ func (s *ServerSession) auth5(nMethod byte, reader io.Reader, writer io.Writer) 
 	buffer := buf.StackNew()
 	defer buffer.Release()
 
-	if _, err = buffer.ReadFullFrom(reader, int32(nMethod)); err != nil {
+	if _, err := buffer.ReadFullFrom(reader, int32(nMethod)); err != nil {
 		return "", newError("failed to read auth methods").Base(err)
 	}
 

@@ -75,7 +75,7 @@ func newRelayedConnectionWithDelayedDial(dialer DelayedDialerForwarded) *connect
 }
 
 func newRelayedConnection(conn io.ReadWriteCloser) *connectionForwarder {
-	fmt.Println("in transport-internet-websocket-connection.go func newRelayedConnection")
+	//fmt.Println("in transport-internet-websocket-connection.go func newRelayedConnection")
 	return &connectionForwarder{
 		ReadWriteCloser: conn,
 		shouldWait:      false,
@@ -84,6 +84,7 @@ func newRelayedConnection(conn io.ReadWriteCloser) *connectionForwarder {
 
 // Read implements net.Conn.Read()
 func (c *connection) Read(b []byte) (int, error) {
+	//fmt.Println("in transport-internet-websocket-connection.go func (c *connection) Reader()")
 	for {
 		reader, err := c.getReader()
 		if err != nil {
@@ -123,6 +124,7 @@ func (c *connection) getReader() (io.Reader, error) {
 func (c *connection) Write(b []byte) (int, error) {
 	//fmt.Println("in transport-internet-websocket-connection.go func (c *connection) Write")
 	if c.shouldWait {
+		//fmt.Println("in transport-internet-websocket-connection.go func (c *connection) Write c.shouldWait")
 		var err error
 		c.conn, err = c.dialer.Dial(b)
 		c.finishedDial()
@@ -140,6 +142,7 @@ func (c *connection) Write(b []byte) (int, error) {
 }
 
 func (c *connection) WriteMultiBuffer(mb buf.MultiBuffer) error {
+	//fmt.Println("in transport-internet-websocket-connection.go func (c *connection) WriteMultiBuffer")
 	mb = buf.Compact(mb)
 	mb, err := buf.WriteMultiBuffer(c, mb)
 	buf.ReleaseMulti(mb)

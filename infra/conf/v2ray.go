@@ -6,7 +6,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+	//"reflect"
 	"strings"
+	//"path/filepath"
+
+	//"reflect"
 
 	//"example.com/gztest" //gztest.GetMessageReflectType(appSettings)
 
@@ -14,6 +18,7 @@ import (
 	"github.com/gzjjjfree/gzv2ray-v4/app/dispatcher"
 	"github.com/gzjjjfree/gzv2ray-v4/app/proxyman"
 	"github.com/gzjjjfree/gzv2ray-v4/app/stats"
+	//"github.com/gzjjjfree/gzv2ray-v4/common/net"
 	"github.com/gzjjjfree/gzv2ray-v4/common/serial"
 )
 
@@ -302,12 +307,14 @@ func (c *OutboundDetourConfig) Build() (*core.OutboundHandlerConfig, error) {
 
 	settings := []byte("{}")
 	if c.Settings != nil {
+		//fmt.Println("in infra-conf-v2raygo func (c *OutboundDetourConfig) Build() c.Setttings: ", *c.Settings)
 		settings = ([]byte)(*c.Settings)
 	}
 	rawConfig, err := outboundConfigLoader.LoadWithID(settings, c.Protocol)
 	if err != nil {
 		return nil, errors.New("failed to parse to outbound detour config")
 	}
+	//fmt.Println("in infra-conf-v2raygo func (c *OutboundDetourConfig) Build() rawConfig.type: ", reflect.TypeOf(rawConfig))	
 	ts, err := rawConfig.(Buildable).Build()
 	if err != nil {
 		return nil, err
